@@ -28,12 +28,48 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            bitmap = new PictureBox();
+            editorGroupBox = new GroupBox();
+            ((System.ComponentModel.ISupportInitialize)bitmap).BeginInit();
+            SuspendLayout();
+            // 
+            // bitmap
+            // 
+            bitmap.Dock = DockStyle.Left;
+            bitmap.Location = new Point(0, 0);
+            bitmap.Name = "bitmap";
+            bitmap.Size = new Size(697, 593);
+            bitmap.TabIndex = 0;
+            bitmap.TabStop = false;
+            // 
+            // editorGroupBox
+            // 
+            editorGroupBox.Location = new Point(703, 0);
+            editorGroupBox.Name = "editorGroupBox";
+            editorGroupBox.RightToLeft = RightToLeft.No;
+            editorGroupBox.Size = new Size(235, 593);
+            editorGroupBox.TabIndex = 1;
+            editorGroupBox.TabStop = false;
+            editorGroupBox.Text = "Editor";
+            // 
+            // PolygonEditor
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Text = "Form1";
+            ClientSize = new Size(942, 593);
+            Controls.Add(editorGroupBox);
+            Controls.Add(bitmap);
+            MaximumSize = new Size(960, 640);
+            MinimumSize = new Size(960, 640);
+            Name = "PolygonEditor";
+            Text = "Polygon Editor";
+            ((System.ComponentModel.ISupportInitialize)bitmap).EndInit();
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private PictureBox bitmap;
+        private GroupBox editorGroupBox;
     }
 }
