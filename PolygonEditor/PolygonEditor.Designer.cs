@@ -28,48 +28,51 @@
         /// </summary>
         private void InitializeComponent()
         {
-            bitmap = new PictureBox();
-            editorGroupBox = new GroupBox();
-            ((System.ComponentModel.ISupportInitialize)bitmap).BeginInit();
+            canvas = new PictureBox();
+            mainGroupBox = new GroupBox();
+            ((System.ComponentModel.ISupportInitialize)canvas).BeginInit();
             SuspendLayout();
             // 
-            // bitmap
+            // canvas
             // 
-            bitmap.Dock = DockStyle.Left;
-            bitmap.Location = new Point(0, 0);
-            bitmap.Name = "bitmap";
-            bitmap.Size = new Size(697, 593);
-            bitmap.TabIndex = 0;
-            bitmap.TabStop = false;
+            canvas.BackColor = SystemColors.ButtonHighlight;
+            canvas.BorderStyle = BorderStyle.FixedSingle;
+            canvas.Dock = DockStyle.Left;
+            canvas.Location = new Point(0, 0);
+            canvas.Name = "canvas";
+            canvas.Size = new Size(697, 593);
+            canvas.TabIndex = 0;
+            canvas.TabStop = false;
+            canvas.Paint += canvas_Paint;
             // 
-            // editorGroupBox
+            // mainGroupBox
             // 
-            editorGroupBox.Location = new Point(703, 0);
-            editorGroupBox.Name = "editorGroupBox";
-            editorGroupBox.RightToLeft = RightToLeft.No;
-            editorGroupBox.Size = new Size(235, 593);
-            editorGroupBox.TabIndex = 1;
-            editorGroupBox.TabStop = false;
-            editorGroupBox.Text = "Editor";
+            mainGroupBox.Location = new Point(703, 0);
+            mainGroupBox.Name = "mainGroupBox";
+            mainGroupBox.RightToLeft = RightToLeft.No;
+            mainGroupBox.Size = new Size(235, 593);
+            mainGroupBox.TabIndex = 1;
+            mainGroupBox.TabStop = false;
+            mainGroupBox.Text = "Editor";
             // 
             // PolygonEditor
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(942, 593);
-            Controls.Add(editorGroupBox);
-            Controls.Add(bitmap);
+            Controls.Add(mainGroupBox);
+            Controls.Add(canvas);
             MaximumSize = new Size(960, 640);
             MinimumSize = new Size(960, 640);
             Name = "PolygonEditor";
             Text = "Polygon Editor";
-            ((System.ComponentModel.ISupportInitialize)bitmap).EndInit();
+            ((System.ComponentModel.ISupportInitialize)canvas).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
 
-        private PictureBox bitmap;
-        private GroupBox editorGroupBox;
+        private PictureBox canvas;
+        private GroupBox mainGroupBox;
     }
 }
