@@ -12,7 +12,6 @@ namespace PolygonEditor.Shapes
         public static readonly int radius = 10;
         private static readonly SolidBrush blackBrush = new SolidBrush(Color.Black);
         private static readonly SolidBrush blueBrush = new SolidBrush(Color.Blue);
-        private static readonly Pen blackPen = new Pen(Color.Black);
         public Vertex(Point point)
         {
             Selected = false;
@@ -41,10 +40,7 @@ namespace PolygonEditor.Shapes
             if(!Selected)
                 e.Graphics.FillEllipse(blackBrush, new Rectangle(X - radius / 2, Y - radius / 2, radius, radius));
             else
-            {
-                e.Graphics.DrawEllipse(blackPen, new Rectangle(X - radius, Y - radius, 2 * radius, 2 * radius));
                 e.Graphics.FillEllipse(blueBrush, new Rectangle(X - radius / 2, Y - radius / 2, radius, radius));
-            }
         }
     }
 }

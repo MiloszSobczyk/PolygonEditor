@@ -32,7 +32,7 @@ namespace PolygonEditor.Shapes
                 Edges.Add(new Edge(RecentVertex, Vertices[0]));
                 Vertices[0].Selected = false;
             }
-            else
+            else if(!Vertices.Any(v => v.X == x && v.Y == y))
             {
                 ++VertexCount;
                 ++EdgeCount;

@@ -45,9 +45,27 @@ namespace PolygonEditor
         }
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!creatingPolygon) return;
             mousePosition = e.Location;
-            if (editedPolygon!.VertexCount >= 3 && Functions.CalculateDistance(mousePosition, editedPolygon!.Vertices[0].Point) < 2 * Vertex.radius)
+            if (!creatingPolygon)
+            {
+                foreach(Polygon polygon in polygons)
+                    foreach(Vertex vertex in  polygon.Vertices)
+                    {
+                        // should also set editedPolyggon to null in certain cases
+                        // should see all that may be selected and check which one is closest
+                        if(Functions.CalculateDistance(mousePosition, vertex.Point) < Vertex.radius)
+                        {
+                            Console.WriteLine("Changed");
+                            editedPolygon = polygon;
+                            vertex.Selected = true;
+                        }
+                        else
+                            vertex.Selected = false;
+                    }
+                this.canvas.Invalidate();
+                return;
+            }
+            if (editedPolygon!.VertexCount >= 3 && Functions.CalculateDistance(mousePosition, editedPolygon!.Vertices[0].Point) < Vertex.radius)
                 editedPolygon.Vertices[0].Selected = true;
             else editedPolygon.Vertices[0].Selected = false;
             this.canvas.Invalidate();
@@ -55,6 +73,9 @@ namespace PolygonEditor
         private void canvas_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (creatingPolygon) return;
+            foreach (Polygon polygon in polygons)
+                foreach (Vertex vertex in polygon.Vertices)
+                    vertex.Selected = false;
             creatingPolygon = true;
             editedPolygon = new Polygon(new Vertex(e.X, e.Y));
             polygons.Add(editedPolygon);
