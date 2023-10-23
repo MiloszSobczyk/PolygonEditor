@@ -8,6 +8,7 @@ namespace PolygonEditor.Shapes
 {
     public class Edge : Shape
     {
+        public static readonly Pen blackPen = new Pen(Color.Black);
         private Vertex vertex1;
         private Vertex vertex2;
         public Vertex Vertex1
@@ -41,5 +42,12 @@ namespace PolygonEditor.Shapes
             this.Vertex1.Move(dX, dY);
             this.Vertex2.Move(dX, dY);
         }
+        public void Draw(Bitmap bitmap, PaintEventArgs e)
+        {
+            // possibly change pen to static field in a class to avoid
+            // creating new one every time
+            e.Graphics.DrawLine(blackPen, vertex1.X, vertex1.Y, vertex2.X, vertex2.Y);
+        }
+
     }
 }

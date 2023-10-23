@@ -44,6 +44,9 @@
             canvas.TabIndex = 0;
             canvas.TabStop = false;
             canvas.Paint += canvas_Paint;
+            canvas.MouseClick += canvas_MouseClick;
+            canvas.MouseDoubleClick += canvas_MouseDoubleClick;
+            canvas.MouseMove += canvas_MouseMove;
             // 
             // mainGroupBox
             // 
