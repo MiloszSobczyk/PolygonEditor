@@ -5,19 +5,15 @@ namespace PolygonEditor
 {
     public partial class PolygonEditor : Form
     {
-        private readonly Pen blackPen;
-        private readonly SolidBrush blackBrush;
         private readonly List<Polygon> polygons;
         private bool creatingPolygon = false;
-        private Polygon? editedPolygon = null;
+        private Polygon? selectedPolygon = null;
         private Point mousePosition;
         private readonly Bitmap bitmap;
         public PolygonEditor()
         {
             InitializeComponent();
             bitmap = new Bitmap(this.canvas.Width, this.canvas.Height);
-            blackPen = new Pen(Color.Black);
-            blackBrush = new SolidBrush(Color.Black);
             polygons = new List<Polygon>();
             IntializePolygons();
         }
@@ -37,9 +33,9 @@ namespace PolygonEditor
             this.polygons.ForEach(polygon => polygon.Draw(bitmap, e));
             if (creatingPolygon)
             {
-                Point lastPoint = editedPolygon!.RecentVertex.Point;
-                e.Graphics.DrawLine(blackPen, lastPoint, mousePosition);
-                e.Graphics.FillEllipse(blackBrush, lastPoint.X - 5, lastPoint.Y - 5, 10, 10);
+                Point lastPoint = selectedPolygon!.RecentVertex.Point;
+                e.Graphics.DrawLine(Polygon.pens["blue"], lastPoint, mousePosition);
+                e.Graphics.FillEllipse(Polygon.brushes["blue"], lastPoint.X - 5, lastPoint.Y - 5, 10, 10);
             }
             e.Graphics.DrawImage(bitmap, 0, 0);
         }
@@ -48,26 +44,24 @@ namespace PolygonEditor
             mousePosition = e.Location;
             if (!creatingPolygon)
             {
-                foreach(Polygon polygon in polygons)
-                    foreach(Vertex vertex in  polygon.Vertices)
+                ChangeSelectedPolygon(null);
+                foreach (Polygon polygon in polygons)
+                {
+                    // should also set editedPolyggon to null in certain cases
+                    // should see all that may be selected and check which one is closest
+                    if (Functions.CalculateDistance(mousePosition, polygon.CenterOfMass) < Vertex.radius)
                     {
-                        // should also set editedPolyggon to null in certain cases
-                        // should see all that may be selected and check which one is closest
-                        if(Functions.CalculateDistance(mousePosition, vertex.Point) < Vertex.radius)
-                        {
-                            Console.WriteLine("Changed");
-                            editedPolygon = polygon;
-                            vertex.Selected = true;
-                        }
-                        else
-                            vertex.Selected = false;
+                        ChangeSelectedPolygon(polygon);
+                        break;
                     }
+                }
                 this.canvas.Invalidate();
                 return;
             }
-            if (editedPolygon!.VertexCount >= 3 && Functions.CalculateDistance(mousePosition, editedPolygon!.Vertices[0].Point) < Vertex.radius)
-                editedPolygon.Vertices[0].Selected = true;
-            else editedPolygon.Vertices[0].Selected = false;
+            if (selectedPolygon!.VertexCount >= 3 && 
+                Functions.CalculateDistance(mousePosition, selectedPolygon!.Vertices[0].Point) < Vertex.radius)
+                selectedPolygon.Vertices[0].Selected = true;
+            else selectedPolygon.Vertices[0].Selected = false;
             this.canvas.Invalidate();
         }
         private void canvas_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -77,8 +71,9 @@ namespace PolygonEditor
                 foreach (Vertex vertex in polygon.Vertices)
                     vertex.Selected = false;
             creatingPolygon = true;
-            editedPolygon = new Polygon(new Vertex(e.X, e.Y));
-            polygons.Add(editedPolygon);
+            selectedPolygon = new Polygon(new Vertex(e.X, e.Y));
+            selectedPolygon.Selected = true;
+            polygons.Add(selectedPolygon);
             this.canvas.Invalidate();
         }
 
@@ -88,26 +83,40 @@ namespace PolygonEditor
             {
                 if (e.Button == MouseButtons.Left)
                 {
-                    Vertex firstVertex = editedPolygon!.Vertices[0];
+                    Vertex firstVertex = selectedPolygon!.Vertices[0];
                     if (firstVertex.Selected)
                     {
-                        editedPolygon.AddVertex(0, 0, true);
-                        editedPolygon = null;
+                        selectedPolygon.AddVertex(0, 0, true);
+                        selectedPolygon = null;
                         creatingPolygon = false;
                     }
-                    else editedPolygon!.AddVertex(e.X, e.Y);
+                    else selectedPolygon!.AddVertex(e.X, e.Y);
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
-                    if (editedPolygon!.RemoveVertex())
+                    if (selectedPolygon!.RemoveLastVertex())
                     {
-                        polygons.Remove(editedPolygon);
+                        polygons.Remove(selectedPolygon);
                         creatingPolygon = false;
-                        editedPolygon = null;
+                        selectedPolygon = null;
                     }
                 }
                 this.canvas.Invalidate();
             }
+            else
+            {
+                foreach(Polygon polygon in polygons)
+                    if(Functions.CalculateDistance(mousePosition, polygon.CenterOfMass) < 10.0f)
+                        ChangeSelectedPolygon(polygon);
+            
+            }
+        }
+        private void ChangeSelectedPolygon(Polygon? newSelectedPolygon)
+        {
+            foreach (Polygon polygon in polygons) polygon.Selected = false;
+            if (newSelectedPolygon == null) return;
+            newSelectedPolygon.Selected = true;
+            selectedPolygon = newSelectedPolygon;
         }
     }
 }
