@@ -47,6 +47,9 @@ namespace PolygonEditor
         {
             if (!creatingPolygon) return;
             mousePosition = e.Location;
+            if (editedPolygon!.VertexCount >= 3 && Functions.CalculateDistance(mousePosition, editedPolygon!.Vertices[0].Point) < 2 * Vertex.radius)
+                editedPolygon.Vertices[0].Selected = true;
+            else editedPolygon.Vertices[0].Selected = false;
             this.canvas.Invalidate();
         }
         private void canvas_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -62,7 +65,17 @@ namespace PolygonEditor
         {
             if (creatingPolygon)
             {
-                if (e.Button == MouseButtons.Left) editedPolygon!.AddVertex(e.X, e.Y);
+                if (e.Button == MouseButtons.Left)
+                {
+                    Vertex firstVertex = editedPolygon!.Vertices[0];
+                    if (firstVertex.Selected)
+                    {
+                        editedPolygon.AddVertex(0, 0, true);
+                        editedPolygon = null;
+                        creatingPolygon = false;
+                    }
+                    else editedPolygon!.AddVertex(e.X, e.Y);
+                }
                 else if (e.Button == MouseButtons.Right)
                 {
                     if (editedPolygon!.RemoveVertex())
@@ -70,9 +83,9 @@ namespace PolygonEditor
                         polygons.Remove(editedPolygon);
                         creatingPolygon = false;
                         editedPolygon = null;
-                        this.canvas.Invalidate();
                     }
                 }
+                this.canvas.Invalidate();
             }
         }
     }

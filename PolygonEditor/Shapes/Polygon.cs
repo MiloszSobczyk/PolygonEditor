@@ -9,8 +9,8 @@ namespace PolygonEditor.Shapes
 {
     public class Polygon : Shape
     {
-        private int vertexCount = 0;
-        private int edgeCount = 0;
+        public int VertexCount { get; private set; } = 0;
+        public int EdgeCount { get; private set; } = 0;
         public Vertex RecentVertex { get; private set; }
         public List<Edge> Edges { get; private set; }
         public List<Vertex> Vertices { get; private set; }
@@ -21,31 +21,32 @@ namespace PolygonEditor.Shapes
             {
                 firstVertex
             };
-            ++vertexCount;
+            ++VertexCount;
             RecentVertex = firstVertex;
         }
         public void AddVertex(int x, int y, bool connectToFirst = false)
         {
             if (connectToFirst)
             {
-                ++edgeCount;
+                ++EdgeCount;
                 Edges.Add(new Edge(RecentVertex, Vertices[0]));
+                Vertices[0].Selected = false;
             }
             else
             {
-                ++vertexCount;
-                ++edgeCount;
+                ++VertexCount;
+                ++EdgeCount;
                 Vertices.Add(new Vertex(x, y));
-                Edges.Add(new Edge(RecentVertex, Vertices[vertexCount - 1]));
-                RecentVertex = Vertices[vertexCount - 1];
+                Edges.Add(new Edge(RecentVertex, Vertices[VertexCount - 1]));
+                RecentVertex = Vertices[VertexCount - 1];
             }
         }
         // For now removes only last vertex. Returns true if there are no more vertices left
         public bool RemoveVertex() 
         {
-            if(vertexCount == 1) return true;
-            Edges.RemoveAt(--edgeCount);
-            Vertices.RemoveAt(--vertexCount);
+            if(VertexCount == 1) return true;
+            Edges.RemoveAt(--EdgeCount);
+            Vertices.RemoveAt(--VertexCount);
             RecentVertex = Vertices.Last();
             return false;
         }
