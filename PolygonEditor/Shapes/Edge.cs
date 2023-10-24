@@ -10,6 +10,7 @@ namespace PolygonEditor.Shapes
     {
         public Vertex Vertex1;
         public Vertex Vertex2;
+        public Point ClickPoint { get; set; }
         public Vertex? FromVertex { get; set; }
         public Edge(Vertex vertex1, Vertex vertex2)
         {
@@ -25,6 +26,13 @@ namespace PolygonEditor.Shapes
         {
             e.Graphics.DrawLine(pen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
         }
-
+        public double CalculateDistanceFromEdge(Point point)
+        {
+            Point vectorA = new Point(Vertex2.X - Vertex1.X, Vertex2.Y - Vertex1.Y);
+            Point vectorC = new Point(point.X - Vertex1.X, point.Y - Vertex1.Y);
+            double lengthAB = Math.Sqrt(vectorA.X * vectorA.X + vectorA.Y * vectorA.Y);
+            double dotProduct = (vectorA.X * vectorC.X + vectorA.Y * vectorC.Y);
+            return Math.Sqrt(Math.Abs(dotProduct) / lengthAB);
+        }
     }
 }

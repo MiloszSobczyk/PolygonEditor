@@ -56,7 +56,7 @@ namespace PolygonEditor.Shapes
                 ++VertexCount;
                 ++EdgeCount;
                 Vertices.Add(new Vertex(x, y));
-                Edges.Add(new Edge(RecentVertex, Vertices[Vertices.Count - 1]));
+                Edges.Add(new Edge(Vertices[Vertices.Count - 2], Vertices[Vertices.Count - 1]));
                 RecentVertex = Vertices[Vertices.Count - 1];
                 CalculateCenterOfMass();
             }
@@ -98,6 +98,7 @@ namespace PolygonEditor.Shapes
         {
             foreach (Vertex vertex in this.Vertices)
                 vertex.Move(dX, dY);
+            CalculateCenterOfMass();
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e)
         {

@@ -46,7 +46,10 @@
             canvas.Paint += canvas_Paint;
             canvas.MouseClick += canvas_MouseClick;
             canvas.MouseDoubleClick += canvas_MouseDoubleClick;
+            canvas.MouseDown += canvas_MouseDown;
             canvas.MouseMove += canvas_MouseMove;
+            canvas.MouseUp += canvas_MouseUp;
+            canvas.PreviewKeyDown += canvas_PreviewKeyDown;
             // 
             // mainGroupBox
             // 
