@@ -7,6 +7,7 @@ namespace PolygonEditor
     {
         private readonly List<Polygon> polygons;
         private bool creatingPolygon = false;
+        private bool editingPolygon = false;
         private Polygon? selectedPolygon = null;
         private Point mousePosition;
         private readonly Bitmap bitmap;
@@ -30,10 +31,11 @@ namespace PolygonEditor
 
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
-            this.polygons.ForEach(polygon => polygon.Draw(bitmap, e));
+            this.polygons.ForEach(polygon => { if (polygon != selectedPolygon) polygon.Draw(bitmap, e); });
+            if(selectedPolygon != null) selectedPolygon.Draw(bitmap, e);
             if (creatingPolygon)
             {
-                Point lastPoint = selectedPolygon!.RecentVertex.Point;
+                Point lastPoint = selectedPolygon!.Vertices.Last().Point;
                 e.Graphics.DrawLine(Polygon.pens["blue"], lastPoint, mousePosition);
                 e.Graphics.FillEllipse(Polygon.brushes["blue"], lastPoint.X - 5, lastPoint.Y - 5, 10, 10);
             }
@@ -42,13 +44,11 @@ namespace PolygonEditor
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
             mousePosition = e.Location;
-            if (!creatingPolygon)
+            if (!creatingPolygon && !editingPolygon)
             {
                 ChangeSelectedPolygon(null);
                 foreach (Polygon polygon in polygons)
                 {
-                    // should also set editedPolyggon to null in certain cases
-                    // should see all that may be selected and check which one is closest
                     if (Functions.CalculateDistance(mousePosition, polygon.CenterOfMass) < Vertex.radius)
                     {
                         ChangeSelectedPolygon(polygon);
@@ -66,17 +66,16 @@ namespace PolygonEditor
         }
         private void canvas_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (creatingPolygon) return;
+            if (creatingPolygon || editingPolygon) return;
             foreach (Polygon polygon in polygons)
                 foreach (Vertex vertex in polygon.Vertices)
                     vertex.Selected = false;
             creatingPolygon = true;
-            selectedPolygon = new Polygon(new Vertex(e.X, e.Y));
-            selectedPolygon.Selected = true;
-            polygons.Add(selectedPolygon);
+            Polygon newPolygon = new Polygon(new Vertex(e.X, e.Y));
+            ChangeSelectedPolygon(newPolygon);
+            polygons.Add(newPolygon);
             this.canvas.Invalidate();
         }
-
         private void canvas_MouseClick(object sender, MouseEventArgs e)
         {
             if (creatingPolygon)
@@ -94,7 +93,8 @@ namespace PolygonEditor
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
-                    if (selectedPolygon!.RemoveLastVertex())
+                    selectedPolygon!.RemoveVertex(selectedPolygon!.Vertices.Last());
+                    if(selectedPolygon.Vertices.Count == 0)
                     {
                         polygons.Remove(selectedPolygon);
                         creatingPolygon = false;
@@ -102,13 +102,26 @@ namespace PolygonEditor
                     }
                 }
                 this.canvas.Invalidate();
+                return;
             }
-            else
+            else if(editingPolygon)
             {
-                foreach(Polygon polygon in polygons)
-                    if(Functions.CalculateDistance(mousePosition, polygon.CenterOfMass) < 10.0f)
-                        ChangeSelectedPolygon(polygon);
-            
+                if(e.Button == MouseButtons.Left)
+                {
+
+                }
+                else if(e.Button == MouseButtons.Right)
+                {
+                    selectedPolygon!.RemoveVertex(selectedPolygon.Vertices.Last());
+                    //ChangeSelectedPolygon(null);
+                    //editingPolygon = false;
+                    //creatingPolygon = false;
+                }
+            }
+            else if(selectedPolygon != null && 
+                Functions.CalculateDistance(mousePosition, selectedPolygon.CenterOfMass) < 10.0f)
+            {
+                editingPolygon = true;
             }
         }
         private void ChangeSelectedPolygon(Polygon? newSelectedPolygon)

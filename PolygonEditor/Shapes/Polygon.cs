@@ -30,6 +30,7 @@ namespace PolygonEditor.Shapes
         public List<Edge> Edges { get; private set; }
         public List<Vertex> Vertices { get; private set; }
         public bool Selected { get; set; } = false;
+        public bool Finished { get; private set; } = false;
         public Polygon(Vertex firstVertex)
         {
             Edges = new List<Edge>();
@@ -48,6 +49,7 @@ namespace PolygonEditor.Shapes
                 ++EdgeCount;
                 Edges.Add(new Edge(RecentVertex, Vertices[0]));
                 Vertices[0].Selected = false;
+                Finished = true;
             }
             else if(!Vertices.Any(v => v.X == x && v.Y == y))
             {
@@ -64,21 +66,32 @@ namespace PolygonEditor.Shapes
             int xSum = 0;
             int ySum = 0;
             Vertices.ForEach(v => { xSum += v.X; ySum += v.Y; });
-            CenterOfMass = new Point(xSum / VertexCount, ySum / VertexCount);
+            CenterOfMass = new Point(xSum / Vertices.Count, ySum / Vertices.Count);
         }
-        // For now removes only last vertex. Returns true if there are no more vertices left
-        public bool RemoveLastVertex() 
+        public void RemoveVertex(Vertex vertex)
         {
-            if(VertexCount == 1) return true;
-            Edges.RemoveAt(--EdgeCount);
-            Vertices.RemoveAt(--VertexCount);
-            RecentVertex = Vertices.Last();
+            if(Vertices.Count <= 2)
+            {
+                Vertices.RemoveAt(Vertices.Count - 1);
+                Edges.Clear();
+                if(Vertices.Count != 0) CalculateCenterOfMass();
+                return;
+            }
+            int index = Vertices.IndexOf(vertex);
+            if (index == -1) return;
+            // what will before adn after vertices be equal to if the polygon is not finished
+            Vertex beforeVertex = index == 0 ? Vertices.Last() : Vertices[index - 1];
+            Vertex afterVertex = index == Vertices.Count - 1 ? Vertices.First() : Vertices[index + 1];
+            Edge beforeEdge = index == 0 ? Edges.Last() : Edges[index - 1];
+            if(Finished)
+            {
+                Edge afterEdge = index == Vertices.Count - 1 ? Edges.Last() : Edges[index + 1];
+                Edges.Insert(index == 0 ? Edges.Count - 1 : index - 1, new Edge(beforeVertex, afterVertex));
+                Edges.Remove(afterEdge);
+            }
+            Edges.Remove(beforeEdge);
+            Vertices.RemoveAt(index);
             CalculateCenterOfMass();
-            return false;
-        }
-        public bool RemoveVertex(Vertex vertex)
-        {
-            return true;
         }
         public override void Move(int dX, int dY)
         {
