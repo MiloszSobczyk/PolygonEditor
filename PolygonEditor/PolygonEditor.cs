@@ -112,7 +112,17 @@ namespace PolygonEditor
                 }
                 else if(e.Button == MouseButtons.Right)
                 {
-                    selectedPolygon!.RemoveVertex(selectedPolygon.Vertices.Last());
+                    foreach(Vertex vertex in selectedPolygon!.Vertices)
+                        if (Functions.CalculateDistance(vertex.Point, e.Location) < 10.0f)
+                        {
+                            selectedPolygon!.RemoveVertex(vertex);
+                            if(selectedPolygon!.Vertices.Count == 1)
+                            {
+                                editingPolygon = false;
+                                creatingPolygon = true;
+                            }
+                            return;
+                        }
                     //ChangeSelectedPolygon(null);
                     //editingPolygon = false;
                     //creatingPolygon = false;
@@ -127,9 +137,12 @@ namespace PolygonEditor
         private void ChangeSelectedPolygon(Polygon? newSelectedPolygon)
         {
             foreach (Polygon polygon in polygons) polygon.Selected = false;
-            if (newSelectedPolygon == null) return;
-            newSelectedPolygon.Selected = true;
-            selectedPolygon = newSelectedPolygon;
+            if (newSelectedPolygon != null)
+            {
+                newSelectedPolygon.Selected = true;
+                selectedPolygon = newSelectedPolygon;
+            }
+            this.canvas.Invalidate();
         }
     }
 }

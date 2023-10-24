@@ -56,8 +56,8 @@ namespace PolygonEditor.Shapes
                 ++VertexCount;
                 ++EdgeCount;
                 Vertices.Add(new Vertex(x, y));
-                Edges.Add(new Edge(RecentVertex, Vertices[VertexCount - 1]));
-                RecentVertex = Vertices[VertexCount - 1];
+                Edges.Add(new Edge(RecentVertex, Vertices[Vertices.Count - 1]));
+                RecentVertex = Vertices[Vertices.Count - 1];
                 CalculateCenterOfMass();
             }
         }
@@ -72,9 +72,10 @@ namespace PolygonEditor.Shapes
         {
             if(Vertices.Count <= 2)
             {
-                Vertices.RemoveAt(Vertices.Count - 1);
+                Vertices.Remove(vertex);
                 Edges.Clear();
                 if(Vertices.Count != 0) CalculateCenterOfMass();
+                Finished = false;
                 return;
             }
             int index = Vertices.IndexOf(vertex);
@@ -85,7 +86,7 @@ namespace PolygonEditor.Shapes
             Edge beforeEdge = index == 0 ? Edges.Last() : Edges[index - 1];
             if(Finished)
             {
-                Edge afterEdge = index == Vertices.Count - 1 ? Edges.Last() : Edges[index + 1];
+                Edge afterEdge = Edges[index];
                 Edges.Insert(index == 0 ? Edges.Count - 1 : index - 1, new Edge(beforeVertex, afterVertex));
                 Edges.Remove(afterEdge);
             }
