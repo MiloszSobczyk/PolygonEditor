@@ -28,11 +28,21 @@ namespace PolygonEditor.Shapes
         }
         public double CalculateDistanceFromEdge(Point point)
         {
-            Point vectorA = new Point(Vertex2.X - Vertex1.X, Vertex2.Y - Vertex1.Y);
-            Point vectorC = new Point(point.X - Vertex1.X, point.Y - Vertex1.Y);
-            double lengthAB = Math.Sqrt(vectorA.X * vectorA.X + vectorA.Y * vectorA.Y);
-            double dotProduct = (vectorA.X * vectorC.X + vectorA.Y * vectorC.Y);
-            return Math.Sqrt(Math.Abs(dotProduct) / lengthAB);
+            //Point vectorA = new Point(Vertex2.X - Vertex1.X, Vertex2.Y - Vertex1.Y);
+            //Point vectorC = new Point(point.X - Vertex1.X, point.Y - Vertex1.Y);
+            //double lengthAB = Math.Sqrt(vectorA.X * vectorA.X + vectorA.Y * vectorA.Y);
+            //double dotProduct = (vectorA.X * vectorC.X + vectorA.Y * vectorC.Y);
+            //return Math.Sqrt(Math.Abs(dotProduct) / lengthAB);
+
+            double A = point.X - Vertex1.X; // position of point rel one end of line
+            double B = point.Y - Vertex1.Y;
+            double C = Vertex2.X - Vertex1.X; // vector along line
+            double D = Vertex2.Y - Vertex1.Y;
+
+            double dot = A * (-D) + B * C;
+            double len_sq = D * D + C * C;
+
+            return Math.Abs(dot) / Math.Sqrt(len_sq);
         }
     }
 }
