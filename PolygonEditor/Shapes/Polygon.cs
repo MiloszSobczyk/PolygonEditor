@@ -119,5 +119,26 @@ namespace PolygonEditor.Shapes
             e.Graphics.FillEllipse(brushes["red"], CenterOfMass.X - 5, CenterOfMass.Y - 5,
                 10, 10);
         }
+        public void AddBetween(Edge selectedEdge)
+        {
+            Console.WriteLine();
+            Vertex v1 = selectedEdge.Vertex1;
+            Vertex v2 = selectedEdge.Vertex2;
+            int indexV1 = Vertices.IndexOf(v1);
+            int indexV2 = Vertices.IndexOf(v2);
+            int edgeIndex = Edges.IndexOf(selectedEdge);
+            if(edgeIndex == -1) return;
+            
+            Vertex newVertex = new Vertex((v1.X + v2.X) / 2, (v1.Y + v2.Y) / 2);
+            Edge newEdge1 = new Edge(indexV1 <= indexV2 ? v2 : v1, newVertex);
+            Edge newEdge2 = new Edge(newVertex, indexV1 <= indexV2 ? v1 : v2);
+            Vertices.Insert(edgeIndex + 1, newVertex);
+            Edges.Insert(edgeIndex, newEdge1);
+            Edges.Insert(edgeIndex + 1, newEdge2);
+            Edges.Remove(selectedEdge);
+
+            CalculateCenterOfMass();
+            Console.WriteLine();
+        }
     }
 }

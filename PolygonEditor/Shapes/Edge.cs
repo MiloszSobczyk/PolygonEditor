@@ -8,6 +8,7 @@ namespace PolygonEditor.Shapes
 {
     public class Edge : Shape
     {
+        private static readonly double accuracy = 3.0;
         public Vertex Vertex1;
         public Vertex Vertex2;
         public Point ClickPoint { get; set; }
@@ -21,6 +22,7 @@ namespace PolygonEditor.Shapes
         {
             this.Vertex1.Move(dX, dY);
             this.Vertex2.Move(dX, dY);
+            Console.WriteLine();
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, Pen pen)
         {
@@ -28,21 +30,28 @@ namespace PolygonEditor.Shapes
         }
         public double CalculateDistanceFromEdge(Point point)
         {
-            //Point vectorA = new Point(Vertex2.X - Vertex1.X, Vertex2.Y - Vertex1.Y);
-            //Point vectorC = new Point(point.X - Vertex1.X, point.Y - Vertex1.Y);
-            //double lengthAB = Math.Sqrt(vectorA.X * vectorA.X + vectorA.Y * vectorA.Y);
-            //double dotProduct = (vectorA.X * vectorC.X + vectorA.Y * vectorC.Y);
-            //return Math.Sqrt(Math.Abs(dotProduct) / lengthAB);
-
-            double A = point.X - Vertex1.X; // position of point rel one end of line
+            if (point.X < Math.Min(Vertex1.X, Vertex2.X) - accuracy 
+                || point.X > Math.Max(Vertex1.X, Vertex2.X) + accuracy)
+                return int.MaxValue;
+            if (point.Y < Math.Min(Vertex1.Y, Vertex2.Y) - accuracy 
+                || point.Y > Math.Max(Vertex1.Y, Vertex2.Y) + accuracy)
+                return int.MaxValue;
+            double A = point.X - Vertex1.X;
             double B = point.Y - Vertex1.Y;
-            double C = Vertex2.X - Vertex1.X; // vector along line
+            double C = Vertex2.X - Vertex1.X;
             double D = Vertex2.Y - Vertex1.Y;
 
             double dot = A * (-D) + B * C;
             double len_sq = D * D + C * C;
 
             return Math.Abs(dot) / Math.Sqrt(len_sq);
+        }
+        public double CalculateDistanceFromEdge2(Point point)
+        {
+            double a = (Vertex1.Y - Vertex2.Y) / (Vertex1.X - Vertex2.X);
+            double b = Vertex1.Y - Vertex1.X * a;
+            double aInverse = 1 / a; // check if a == 0 or a == inf
+            return 0.0;
         }
     }
 }

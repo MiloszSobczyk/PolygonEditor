@@ -10,8 +10,8 @@ namespace PolygonEditor
         private bool creatingPolygon = false;
         private bool editingPolygon = false;
         private Polygon? selectedPolygon = null;
-        private Vertex? movedVertex = null;
-        private Edge? movedEdge = null;
+        private Vertex? selectedVertex = null;
+        private Edge? selectedEdge = null;
         private Point mousePosition;
         private readonly Bitmap bitmap;
         private bool mouseDown = false;
@@ -25,10 +25,9 @@ namespace PolygonEditor
         private void IntializePolygons()
         {
             Polygon p1 = new Polygon(new Vertex(100, 100));
-            p1.AddVertex(200, 200);
-            p1.AddVertex(300, 200);
-            p1.AddVertex(200, 400);
-            p1.AddVertex(451, 153);
+            p1.AddVertex(300, 100);
+            p1.AddVertex(300, 300);
+            p1.AddVertex(100, 300);
             p1.AddVertex(100, 100, true);
             polygons.Add(p1);
         }
@@ -47,18 +46,18 @@ namespace PolygonEditor
         }
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (movedVertex != null && editingPolygon)
+            if (selectedVertex != null && editingPolygon)
             {
-                movedVertex.Move(e.Location.X - movedVertex.X, e.Location.Y - movedVertex.Y);
+                selectedVertex.Move(e.Location.X - selectedVertex.X, e.Location.Y - selectedVertex.Y);
                 selectedPolygon!.CalculateCenterOfMass();
                 this.canvas.Invalidate();
                 return;
             }
-            if (movedEdge != null && editingPolygon)
+            if (selectedEdge != null && editingPolygon)
             {
-                movedEdge.Move(e.Location.X - movedEdge.ClickPoint.X, e.Location.Y - movedEdge.ClickPoint.Y);
+                selectedEdge.Move(e.Location.X - selectedEdge.ClickPoint.X, e.Location.Y - selectedEdge.ClickPoint.Y);
                 selectedPolygon!.CalculateCenterOfMass();
-                movedEdge.ClickPoint = e.Location;
+                selectedEdge.ClickPoint = e.Location;
                 this.canvas.Invalidate();
                 return;
             }
@@ -77,15 +76,27 @@ namespace PolygonEditor
                 this.canvas.Invalidate();
                 return;
             }
-            if (selectedPolygon!.VertexCount >= 0 &&
-                Functions.CalculateDistance(mousePosition, selectedPolygon!.Vertices[0].Point) < Vertex.radius)
+            if (selectedPolygon == null) return;
+            if (selectedPolygon.Vertices.Count >= 0 &&
+                Functions.CalculateDistance(mousePosition, selectedPolygon.Vertices[0].Point) < Vertex.radius)
                 selectedPolygon.Vertices[0].Selected = true;
             else selectedPolygon.Vertices[0].Selected = false;
             this.canvas.Invalidate();
         }
         private void canvas_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (creatingPolygon || editingPolygon) return;
+            if (creatingPolygon) return;
+            if (editingPolygon)
+            {
+                if(selectedEdge != null)
+                {
+                    selectedPolygon!.AddBetween(selectedEdge);
+                    selectedEdge = null;
+                    this.canvas.Invalidate();
+                    return;
+                }
+            }
+
             foreach (Polygon polygon in polygons)
                 foreach (Vertex vertex in polygon.Vertices)
                     vertex.Selected = false;
@@ -105,8 +116,8 @@ namespace PolygonEditor
                     if (firstVertex.Selected)
                     {
                         selectedPolygon.AddVertex(0, 0, true);
-                        selectedPolygon = null;
                         creatingPolygon = false;
+                        editingPolygon = true;
                     }
                     else selectedPolygon!.AddVertex(e.X, e.Y);
                 }
@@ -165,25 +176,25 @@ namespace PolygonEditor
         }
         private void canvas_MouseDown(object sender, MouseEventArgs e)
         {
-            if (selectedPolygon == null || movedVertex != null || movedVertex != null) return;
+            if (selectedPolygon == null || selectedVertex != null || selectedVertex != null) return;
             mouseDown = (e.Button == MouseButtons.Left);
-            movedVertex = selectedPolygon!.Vertices
+            selectedVertex = selectedPolygon!.Vertices
                 .FirstOrDefault(vertex => Functions.CalculateDistance(e.Location, vertex.Point) < Vertex.radius);
-            if(movedVertex != null)
+            if(selectedVertex != null)
             {
-                movedEdge = null;
+                selectedEdge = null;
                 return;
             }
-            movedEdge = selectedPolygon!.Edges
+            selectedEdge = selectedPolygon!.Edges
                 .FirstOrDefault(edge => edge.CalculateDistanceFromEdge(e.Location) < 10.0f);
-            if (movedEdge != null)
-                movedEdge.ClickPoint = e.Location;
+            if (selectedEdge != null)
+                selectedEdge.ClickPoint = e.Location;
         }
         private void canvas_MouseUp(object sender, MouseEventArgs e)
         {
             mouseDown = false;
-            movedVertex = null;
-            movedEdge = null;
+            selectedVertex = null;
+            selectedEdge = null;
         }
         private void canvas_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
@@ -192,7 +203,7 @@ namespace PolygonEditor
                 creatingPolygon = false;
                 editingPolygon = false;
                 ChangeSelectedPolygon(null);
-                movedVertex = null;
+                selectedVertex = null;
             }
             this.canvas.Invalidate();
         }
