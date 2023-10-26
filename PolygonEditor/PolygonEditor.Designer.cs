@@ -49,7 +49,6 @@
             canvas.MouseDown += canvas_MouseDown;
             canvas.MouseMove += canvas_MouseMove;
             canvas.MouseUp += canvas_MouseUp;
-            canvas.PreviewKeyDown += canvas_PreviewKeyDown;
             // 
             // mainGroupBox
             // 
@@ -72,6 +71,7 @@
             MinimumSize = new Size(960, 640);
             Name = "PolygonEditor";
             Text = "Polygon Editor";
+            KeyDown += PolygonEditor_KeyDown;
             ((System.ComponentModel.ISupportInitialize)canvas).EndInit();
             ResumeLayout(false);
         }

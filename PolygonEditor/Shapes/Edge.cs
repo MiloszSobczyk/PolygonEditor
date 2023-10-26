@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace PolygonEditor.Shapes
 {
+    public enum Relation
+    {
+        None,
+        Vertical,
+        Horizontal,
+    }
     public class Edge : Shape
     {
         private static readonly double accuracy = 3.0;

@@ -11,12 +11,14 @@ namespace PolygonEditor
         private bool editingPolygon = false;
         private Polygon? selectedPolygon = null;
         private Vertex? selectedVertex = null;
+        private bool movingPolygon = false;
         private Edge? selectedEdge = null;
         private Point mousePosition;
         private readonly Bitmap bitmap;
         private bool mouseDown = false;
         public PolygonEditor()
         {
+            this.KeyPreview = true;
             InitializeComponent();
             bitmap = new Bitmap(this.canvas.Width, this.canvas.Height);
             polygons = new List<Polygon>();
@@ -61,7 +63,7 @@ namespace PolygonEditor
                 this.canvas.Invalidate();
                 return;
             }
-            if(selectedPolygon != null && editingPolygon && mouseDown)
+            if (selectedPolygon != null && editingPolygon && movingPolygon)
             {
                 selectedPolygon.Move(e.Location.X - selectedPolygon.CenterOfMass.X, e.Location.Y - selectedPolygon.CenterOfMass.Y);
                 selectedPolygon.CalculateCenterOfMass();
@@ -95,7 +97,7 @@ namespace PolygonEditor
             if (creatingPolygon) return;
             if (editingPolygon)
             {
-                if(selectedEdge != null)
+                if (selectedEdge != null)
                 {
                     selectedPolygon!.AddBetween(selectedEdge);
                     selectedEdge = null;
@@ -150,10 +152,10 @@ namespace PolygonEditor
                 else if (e.Button == MouseButtons.Right)
                 {
                     foreach (Vertex vertex in selectedPolygon!.Vertices)
-                        if (Functions.CalculateDistance(vertex.Point, e.Location) < 2.0f)
+                        if (Functions.CalculateDistance(vertex.Point, e.Location) < 3.0f)
                         {
                             selectedPolygon!.RemoveVertex(vertex);
-                            if (selectedPolygon!.Vertices.Count == 1)
+                            if (selectedPolygon!.Vertices.Count == 2)
                             {
                                 editingPolygon = false;
                                 creatingPolygon = true;
@@ -179,21 +181,24 @@ namespace PolygonEditor
         }
         private void canvas_MouseDown(object sender, MouseEventArgs e)
         {
-            mouseDown = (e.Button == MouseButtons.Left);
+            if (selectedPolygon == null || selectedVertex != null || selectedVertex != null) return;
+            
             if (selectedPolygon != null &&
                 Functions.CalculateDistance(mousePosition, selectedPolygon.CenterOfMass) < 10.0f)
             {
                 editingPolygon = true;
+                movingPolygon = true;
                 return;
             }
-            if (selectedPolygon == null || selectedVertex != null || selectedVertex != null) return;
+
             selectedVertex = selectedPolygon!.Vertices
                 .FirstOrDefault(vertex => Functions.CalculateDistance(e.Location, vertex.Point) < Vertex.radius);
-            if(selectedVertex != null)
+            if (selectedVertex != null)
             {
                 selectedEdge = null;
                 return;
             }
+
             selectedEdge = selectedPolygon!.Edges
                 .FirstOrDefault(edge => edge.CalculateDistanceFromEdge(e.Location) < 10.0f);
             if (selectedEdge != null)
@@ -204,15 +209,29 @@ namespace PolygonEditor
             mouseDown = false;
             selectedVertex = null;
             selectedEdge = null;
+            movingPolygon = false;
         }
-        private void canvas_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        private void PolygonEditor_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.E)
+            if(e.KeyCode == Keys.Escape)
             {
-                creatingPolygon = false;
+
+            }
+            else if (e.KeyCode == Keys.Tab)
+            {
+                if (polygons.Count == 1) return;
+                int index = selectedPolygon == null ? 0 : polygons.IndexOf(selectedPolygon);
+                ChangeSelectedPolygon(polygons[index == polygons.Count - 1 ? 0 : index + 1]);
+            }
+            else if(e.KeyCode == Keys.R)
+            {
+                polygons.Clear();
                 editingPolygon = false;
-                ChangeSelectedPolygon(null);
+                creatingPolygon = false;
+                selectedPolygon = null;
+                selectedEdge = null;
                 selectedVertex = null;
+                this.KeyPreview = true;
             }
             this.canvas.Invalidate();
         }
