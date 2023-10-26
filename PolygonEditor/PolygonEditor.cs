@@ -61,6 +61,13 @@ namespace PolygonEditor
                 this.canvas.Invalidate();
                 return;
             }
+            if(selectedPolygon != null && editingPolygon && mouseDown)
+            {
+                selectedPolygon.Move(e.Location.X - selectedPolygon.CenterOfMass.X, e.Location.Y - selectedPolygon.CenterOfMass.Y);
+                selectedPolygon.CalculateCenterOfMass();
+                this.canvas.Invalidate();
+                return;
+            }
             mousePosition = e.Location;
             if (!creatingPolygon && !editingPolygon)
             {
@@ -158,11 +165,7 @@ namespace PolygonEditor
                     //creatingPolygon = false;
                 }
             }
-            else if (selectedPolygon != null &&
-                Functions.CalculateDistance(mousePosition, selectedPolygon.CenterOfMass) < 10.0f)
-            {
-                editingPolygon = true;
-            }
+
         }
         private void ChangeSelectedPolygon(Polygon? newSelectedPolygon)
         {
@@ -176,8 +179,14 @@ namespace PolygonEditor
         }
         private void canvas_MouseDown(object sender, MouseEventArgs e)
         {
-            if (selectedPolygon == null || selectedVertex != null || selectedVertex != null) return;
             mouseDown = (e.Button == MouseButtons.Left);
+            if (selectedPolygon != null &&
+                Functions.CalculateDistance(mousePosition, selectedPolygon.CenterOfMass) < 10.0f)
+            {
+                editingPolygon = true;
+                return;
+            }
+            if (selectedPolygon == null || selectedVertex != null || selectedVertex != null) return;
             selectedVertex = selectedPolygon!.Vertices
                 .FirstOrDefault(vertex => Functions.CalculateDistance(e.Location, vertex.Point) < Vertex.radius);
             if(selectedVertex != null)
