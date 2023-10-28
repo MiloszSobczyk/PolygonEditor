@@ -48,6 +48,7 @@ namespace PolygonEditor
         }
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
+            mousePosition = e.Location;
             if (selectedVertex != null && editingPolygon)
             {
                 selectedVertex.Move(e.Location.X - selectedVertex.X, e.Location.Y - selectedVertex.Y);
@@ -70,7 +71,6 @@ namespace PolygonEditor
                 this.canvas.Invalidate();
                 return;
             }
-            mousePosition = e.Location;
             if (!creatingPolygon && !editingPolygon)
             {
                 ChangeSelectedPolygon(null);
