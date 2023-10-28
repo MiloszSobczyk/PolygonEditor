@@ -110,7 +110,7 @@ namespace PolygonEditor.Shapes
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e)
         {
-            if(Hovered)
+            if(Hovered || Selected)
             {
                 foreach (Vertex vertex in this.Vertices)
                     vertex.Draw(bitmap, e, brushes["blue"]);

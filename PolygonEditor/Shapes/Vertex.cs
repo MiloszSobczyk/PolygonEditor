@@ -11,6 +11,7 @@ namespace PolygonEditor.Shapes
     public class Vertex : Shape
     {
         public static readonly int radius = 10;
+        private static readonly Brush activeBrush = new SolidBrush(Color.Green);
         public Vertex(Point point)
         {
             X = point.X;
@@ -29,32 +30,17 @@ namespace PolygonEditor.Shapes
         }
         public override void Move(int dX, int dY)
         {
-            if (Neighbors[0].constraint == Constraint.None && Neighbors[1].constraint == Constraint.None)
-            {
-                X += dX;
-                Y += dY;
-                return;
-            }
-            if (Neighbors[0].constraint != Constraint.None)
-            {
-                int constraint = (int)Neighbors[0].constraint;
-                //Neighbors[0].vertex.X += (1 - constraint) * dX;
-                //Neighbors[0].vertex.Y += constraint * dY;
-                X += (1 - constraint) * dX;
-                Y += constraint * dY;
-            }
-            if (Neighbors[1].constraint != Constraint.None)
-            {
-                int constraint = (int)Neighbors[1].constraint;
-                //Neighbors[1].vertex.X += (1 - constraint) * dX;
-                //Neighbors[1].vertex.Y += constraint * dY;
-                X += (1 - constraint) * dX;
-                Y += constraint * dY;
-            }
+            X += dX;
+            Y += dY;
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, Brush brush)
         {
-            e.Graphics.FillEllipse(brush, new Rectangle(X - radius / 2, Y - radius / 2, radius, radius));
+            if(Hovered)
+                e.Graphics.FillEllipse(activeBrush, new Rectangle(X - radius / 2, Y - radius / 2, radius, radius));
+            else if(Selected)
+                e.Graphics.FillEllipse(activeBrush, new Rectangle(X - radius / 2, Y - radius / 2, radius, radius));
+            else
+                e.Graphics.FillEllipse(brush, new Rectangle(X - radius / 2, Y - radius / 2, radius, radius));
         }
     }
 }
