@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PolygonEditor.Shapes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,17 @@ namespace PolygonEditor
         public static double CalculateDistance(Point p1, Point p2)
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
+        }
+        public static bool UpdateConstraints(Vertex vertex1, Vertex vertex2, Constraint constraint)
+        {
+            if(constraint != Constraint.None)
+            {
+                if (vertex1.Neighbors[0].constraint == constraint) return false;
+                if (vertex2.Neighbors[1].constraint == constraint) return false;
+            }
+            vertex1.Neighbors[1] = (vertex2, constraint);
+            vertex2.Neighbors[0] = (vertex1, constraint);
+            return true;
         }
         public static void line(int x, int y, int x2, int y2, int color)
         {

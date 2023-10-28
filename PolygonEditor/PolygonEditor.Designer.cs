@@ -74,6 +74,7 @@
             verticalCheckbox.TabIndex = 1;
             verticalCheckbox.Text = "Vertical";
             verticalCheckbox.UseVisualStyleBackColor = true;
+            verticalCheckbox.Visible = false;
             // 
             // horizontalCheckbox
             // 
@@ -84,6 +85,7 @@
             horizontalCheckbox.TabIndex = 0;
             horizontalCheckbox.Text = "Horizontal";
             horizontalCheckbox.UseVisualStyleBackColor = true;
+            horizontalCheckbox.Visible = false;
             // 
             // PolygonEditor
             // 

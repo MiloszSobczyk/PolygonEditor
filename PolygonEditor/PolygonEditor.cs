@@ -9,6 +9,7 @@ namespace PolygonEditor
         private readonly List<Polygon> polygons;
         private bool creatingPolygon = false; // selectedPolygon.Finished
         private bool editingPolygon = false; // !selectedPolygon.Finished
+        private bool mouseDown = false;
         private Polygon? hoveredPolygon = null;
         private Polygon? selectedPolygon = null;
         private Vertex? hoveredVertex = null;
@@ -18,7 +19,6 @@ namespace PolygonEditor
 
         private Point mousePosition;
         private readonly Bitmap bitmap;
-        private bool mouseDown = false;
         public PolygonEditor()
         {
             this.KeyPreview = true;
@@ -81,7 +81,7 @@ namespace PolygonEditor
                     mousePosition.Y - selectedEdge.ClickPoint.Y);
                 selectedEdge.ClickPoint = mousePosition;
             }
-            else if (selectedPolygon != null && mouseDown 
+            else if (selectedPolygon != null && mouseDown
                 && selectedEdge == null && selectedVertex == null)
             {
                 selectedPolygon.Move(mousePosition.X - selectedPolygon.CenterOfMass.X,
@@ -124,7 +124,14 @@ namespace PolygonEditor
                     ChangeSelectedEdge(hoveredEdge);
                 }
                 if (e.Button == MouseButtons.Right && hoveredVertex != null)
+                {
                     selectedPolygon!.RemoveVertex(hoveredVertex);
+                    if (!selectedPolygon.Finished)
+                    {
+                        creatingPolygon = true;
+                        editingPolygon = false;
+                    }
+                }
             }
             if (selectedPolygon != null && selectedPolygon.Vertices.Count == 0)
             {
@@ -144,7 +151,7 @@ namespace PolygonEditor
                 {
                     if (hoveredEdge != null)
                     {
-                        selectedPolygon!.AddBetween(hoveredEdge);
+                        selectedPolygon!.AddInBetween(hoveredEdge);
                         ChangeHoveredEdge(null);
                         ChangeSelectedEdge(null);
                         this.canvas.Invalidate();
@@ -183,6 +190,8 @@ namespace PolygonEditor
                     ChangeSelectedPolygon(null);
                 ChangeSelectedEdge(null);
                 ChangeSelectedVertex(null);
+                creatingPolygon = false;
+                editingPolygon = false;
             }
             else if (e.KeyCode == Keys.Tab && polygons.Count != 0)
             {
@@ -201,6 +210,10 @@ namespace PolygonEditor
                 ChangeSelectedVertex(null);
                 ChangeHoveredVertex(null);
             }
+            else if (e.KeyCode == Keys.H && selectedEdge != null)
+                selectedEdge.UpdateConstraints(Constraint.Horizontal);
+            else if (e.KeyCode == Keys.H && selectedEdge != null)
+                selectedEdge.UpdateConstraints(Constraint.Vertical);
             this.canvas.Invalidate();
         }
         private void ChangeHoveredEdge(Edge? newHoveredEdge)
@@ -213,14 +226,16 @@ namespace PolygonEditor
         }
         private void ChangeSelectedEdge(Edge? newSelectedEdge)
         {
-            this.horizontalCheckbox.Checked = false;
-            this.verticalCheckbox.Checked = false;
+            this.horizontalCheckbox.Visible = false;
+            this.verticalCheckbox.Visible = false;
             if (selectedEdge != null)
                 selectedEdge.Selected = false;
             selectedEdge = newSelectedEdge;
             if (selectedEdge != null)
             {
                 selectedEdge.Selected = true;
+                this.horizontalCheckbox.Visible = true;
+                this.verticalCheckbox.Visible = true;
                 this.horizontalCheckbox.Checked = selectedEdge.Constraint == Constraint.Horizontal;
                 this.verticalCheckbox.Checked = selectedEdge.Constraint == Constraint.Vertical;
             }
@@ -270,6 +285,10 @@ namespace PolygonEditor
             if (selectedVertex != null)
                 selectedVertex.Selected = true;
             this.canvas.Invalidate();
+        }
+        private void horizontalCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

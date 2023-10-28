@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PolygonEditor.Shapes
 {
-    public class Polygon : Shape
+    public class Polygon
     {
         public static readonly Dictionary<string, Pen> pens =
             new Dictionary<string, Pen>()
@@ -26,7 +26,6 @@ namespace PolygonEditor.Shapes
         public Point CenterOfMass { get; private set; }
         public int VertexCount { get; private set; } = 0;
         public int EdgeCount { get; private set; } = 0;
-        public Vertex RecentVertex { get; private set; }
         public List<Edge> Edges { get; private set; }
         public List<Vertex> Vertices { get; private set; }
         public bool Selected { get; set; } = false;
@@ -40,7 +39,6 @@ namespace PolygonEditor.Shapes
                 firstVertex
             };
             ++VertexCount;
-            RecentVertex = firstVertex;
             CenterOfMass = firstVertex.Point;
         }
         public void AddVertex(int x, int y, bool connectToFirst = false)
@@ -48,22 +46,16 @@ namespace PolygonEditor.Shapes
             if (connectToFirst)
             {
                 ++EdgeCount;
-                Edges.Add(new Edge(RecentVertex, Vertices[0]));
-                Vertices[0].Hovered = false;
+                Edges.Add(new Edge(Vertices.Last(), Vertices[0]));
                 Finished = true;
-                Vertices.Last().Neighbors[1] = (Vertices.First(), Constraint.None);
-                Vertices.First().Neighbors[0] = (Vertices.Last(), Constraint.None);
             }
             else if(!Vertices.Any(v => v.X == x && v.Y == y))
             {
                 ++VertexCount;
                 ++EdgeCount;
                 Vertex newVertex = new Vertex(x, y);
-                Vertices.Last().Neighbors[1] = (newVertex, Constraint.None);
-                newVertex.Neighbors[0] = (Vertices.Last(), Constraint.None);
                 Vertices.Add(newVertex);
                 Edges.Add(new Edge(Vertices[Vertices.Count - 2], newVertex));
-                RecentVertex = newVertex;
                 CalculateCenterOfMass();
             }
         }
@@ -86,15 +78,12 @@ namespace PolygonEditor.Shapes
             }
             int index = Vertices.IndexOf(vertex);
             if (index == -1) return;
-            // what will before and after vertices be equal to if the polygon is not finished
             Vertex beforeVertex = index == 0 ? Vertices.Last() : Vertices[index - 1];
             Vertex afterVertex = index == Vertices.Count - 1 ? Vertices.First() : Vertices[index + 1];
             Edge beforeEdge = index == 0 ? Edges.Last() : Edges[index - 1];
             if(Finished)
             {
                 Edge afterEdge = Edges[index];
-                beforeVertex.Neighbors[1] = (afterVertex, Constraint.None);
-                afterVertex.Neighbors[0] = (beforeVertex, Constraint.None);
                 Edges.Insert(index == 0 ? Edges.Count - 1 : index - 1, new Edge(beforeVertex, afterVertex));
                 Edges.Remove(afterEdge);
             }
@@ -102,10 +91,29 @@ namespace PolygonEditor.Shapes
             Vertices.RemoveAt(index);
             CalculateCenterOfMass();
         }
-        public override void Move(int dX, int dY)
+        public void Move(int dX, int dY)
         {
             foreach (Vertex vertex in this.Vertices)
                 vertex.Move(dX, dY);
+            CalculateCenterOfMass();
+        }
+        public void AddInBetween(Edge selectedEdge)
+        {
+            int edgeIndex = Edges.IndexOf(selectedEdge);
+            if(edgeIndex == -1) return;
+
+            Vertex vertex1 = selectedEdge.Vertex1!;
+            Vertex vertex2 = selectedEdge.Vertex2!;
+            
+            Vertex newVertex = new Vertex((vertex1.X + vertex2.X) / 2, (vertex1.Y + vertex2.Y) / 2);
+            Edge newEdge1 = new Edge(vertex1, newVertex);
+            Edge newEdge2 = new Edge(newVertex, vertex2);
+
+            Vertices.Insert(edgeIndex + 1, newVertex);
+            Edges.Insert(edgeIndex, newEdge1);
+            Edges.Insert(edgeIndex + 1, newEdge2);
+            Edges.Remove(selectedEdge);
+
             CalculateCenterOfMass();
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e)
@@ -126,31 +134,6 @@ namespace PolygonEditor.Shapes
             }
             e.Graphics.FillEllipse(brushes["red"], CenterOfMass.X - 5, CenterOfMass.Y - 5,
                 10, 10);
-        }
-        public void AddBetween(Edge selectedEdge)
-        {
-            int edgeIndex = Edges.IndexOf(selectedEdge);
-            if(edgeIndex == -1) return;
-
-            Vertex v1 = selectedEdge.Vertex1!;
-            Vertex v2 = selectedEdge.Vertex2!;
-            int indexV1 = Vertices.IndexOf(v1);
-            int indexV2 = Vertices.IndexOf(v2);
-            
-            Vertex newVertex = new Vertex((v1.X + v2.X) / 2, (v1.Y + v2.Y) / 2);
-            Edge newEdge1 = new Edge(indexV1 <= indexV2 ? v2 : v1, newVertex);
-            Edge newEdge2 = new Edge(newVertex, indexV1 <= indexV2 ? v1 : v2);
-
-            newVertex.Neighbors[0] = (v1, Constraint.None);
-            newVertex.Neighbors[1] = (v2, Constraint.None);
-            v1.Neighbors[1] = (newVertex, Constraint.None);
-            v2.Neighbors[0] = (newVertex, Constraint.None);
-            Vertices.Insert(edgeIndex + 1, newVertex);
-            Edges.Insert(edgeIndex, newEdge1);
-            Edges.Insert(edgeIndex + 1, newEdge2);
-            Edges.Remove(selectedEdge);
-
-            CalculateCenterOfMass();
         }
     }
 }
