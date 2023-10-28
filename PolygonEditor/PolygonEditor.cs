@@ -221,7 +221,6 @@ namespace PolygonEditor
             }
             else if (e.KeyCode == Keys.Tab)
             {
-                if (polygons.Count == 1) return;
                 int index = selectedPolygon == null ? 0 : polygons.IndexOf(selectedPolygon);
                 ChangeSelectedPolygon(polygons[index == polygons.Count - 1 ? 0 : index + 1]);
             }
@@ -234,6 +233,14 @@ namespace PolygonEditor
                 selectedEdge = null;
                 selectedVertex = null;
                 this.KeyPreview = true;
+            }
+            else if(e.KeyCode == Keys.H && selectedEdge != null)
+            {
+                selectedEdge.AddConstraint(Constraint.Horizontal);
+            }
+            else if(e.KeyCode == Keys.V && selectedEdge != null)
+            {
+                selectedEdge.AddConstraint(Constraint.Vertical);
             }
             this.canvas.Invalidate();
         }
