@@ -20,6 +20,8 @@ namespace PolygonEditor.Shapes
         public Vertex(int X, int Y) : this(new Point(X, Y)) { }
         public int X { get; set; }
         public int Y { get; set; }
+        public Edge? Edge1 { get; set; }
+        public Edge? Edge2 { get; set; }
         public Point Point
         {
             get { return new Point(X, Y); }

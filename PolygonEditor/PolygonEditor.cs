@@ -95,24 +95,27 @@ namespace PolygonEditor
         private void canvas_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (creatingPolygon) return;
-            if (editingPolygon)
+            if(e.Button == MouseButtons.Left)
             {
-                if (selectedEdge != null)
+                if (editingPolygon)
                 {
-                    selectedPolygon!.AddBetween(selectedEdge);
-                    selectedEdge = null;
-                    this.canvas.Invalidate();
-                    return;
+                    if (selectedEdge != null)
+                    {
+                        selectedPolygon!.AddBetween(selectedEdge);
+                        selectedEdge = null;
+                        this.canvas.Invalidate();
+                        return;
+                    }
                 }
-            }
 
-            foreach (Polygon polygon in polygons)
-                foreach (Vertex vertex in polygon.Vertices)
-                    vertex.Selected = false;
-            creatingPolygon = true;
-            Polygon newPolygon = new Polygon(new Vertex(e.X, e.Y));
-            ChangeSelectedPolygon(newPolygon);
-            polygons.Add(newPolygon);
+                foreach (Polygon polygon in polygons)
+                    foreach (Vertex vertex in polygon.Vertices)
+                        vertex.Selected = false;
+                creatingPolygon = true;
+                Polygon newPolygon = new Polygon(new Vertex(e.X, e.Y));
+                ChangeSelectedPolygon(newPolygon);
+                polygons.Add(newPolygon);
+            }
             this.canvas.Invalidate();
         }
         private void canvas_MouseClick(object sender, MouseEventArgs e)
@@ -145,11 +148,7 @@ namespace PolygonEditor
             }
             else if (editingPolygon)
             {
-                if (e.Button == MouseButtons.Left)
-                {
-
-                }
-                else if (e.Button == MouseButtons.Right)
+                if (e.Button == MouseButtons.Right)
                 {
                     foreach (Vertex vertex in selectedPolygon!.Vertices)
                         if (Functions.CalculateDistance(vertex.Point, e.Location) < 3.0f)
@@ -167,7 +166,6 @@ namespace PolygonEditor
                     //creatingPolygon = false;
                 }
             }
-
         }
         private void ChangeSelectedPolygon(Polygon? newSelectedPolygon)
         {
@@ -176,6 +174,8 @@ namespace PolygonEditor
             {
                 newSelectedPolygon.Selected = true;
                 selectedPolygon = newSelectedPolygon;
+                creatingPolygon = !selectedPolygon.Finished;
+                editingPolygon = !creatingPolygon;
             }
             this.canvas.Invalidate();
         }
@@ -215,7 +215,9 @@ namespace PolygonEditor
         {
             if(e.KeyCode == Keys.Escape)
             {
-
+                ChangeSelectedPolygon(null);
+                creatingPolygon = false;
+                editingPolygon = false;
             }
             else if (e.KeyCode == Keys.Tab)
             {

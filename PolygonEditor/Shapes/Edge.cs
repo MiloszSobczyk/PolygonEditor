@@ -6,17 +6,11 @@ using System.Threading.Tasks;
 
 namespace PolygonEditor.Shapes
 {
-    public enum Relation
-    {
-        None,
-        Vertical,
-        Horizontal,
-    }
     public class Edge : Shape
     {
         private static readonly double accuracy = 3.0;
-        public Vertex Vertex1;
-        public Vertex Vertex2;
+        public Vertex? Vertex1 { get; set; }
+        public Vertex? Vertex2 { get; set; }
         public Point ClickPoint { get; set; }
         public Vertex? FromVertex { get; set; }
         public Edge(Vertex vertex1, Vertex vertex2)
