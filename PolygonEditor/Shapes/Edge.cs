@@ -71,21 +71,5 @@ namespace PolygonEditor.Shapes
             double aInverse = 1 / a; // check if a == 0 or a == inf
             return 0.0;
         }
-
-        public void AddConstraint(Constraint constraint)
-        {
-            if(Vertex1 == null || Vertex2 == null) return;
-            Constraint = constraint;
-            if(Vertex1 == Vertex2.Neighbors[0].vertex)
-            {
-                Vertex2.Neighbors[0] = (Vertex1, constraint);
-                Vertex1.Neighbors[1] = (Vertex2, constraint);
-            }
-            else
-            {
-                Vertex2.Neighbors[1] = (Vertex1, constraint);
-                Vertex1.Neighbors[0] = (Vertex2, constraint);
-            }
-        }
     }
 }

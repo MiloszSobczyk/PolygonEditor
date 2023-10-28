@@ -50,7 +50,7 @@ namespace PolygonEditor
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
             mousePosition = e.Location;
-            if(selectedPolygon == null)
+            if (selectedPolygon == null)
             {
                 ChangeHoveredPolygon(null);
                 foreach (Polygon polygon in polygons)
@@ -77,13 +77,14 @@ namespace PolygonEditor
             }
             else if (selectedEdge != null && mouseDown)
             {
-                selectedEdge.Move(mousePosition.X - selectedEdge.ClickPoint.X, 
+                selectedEdge.Move(mousePosition.X - selectedEdge.ClickPoint.X,
                     mousePosition.Y - selectedEdge.ClickPoint.Y);
                 selectedEdge.ClickPoint = mousePosition;
             }
-            else if (selectedPolygon != null && mouseDown)
+            else if (selectedPolygon != null && mouseDown 
+                && selectedEdge == null && selectedVertex == null)
             {
-                selectedPolygon.Move(mousePosition.X - selectedPolygon.CenterOfMass.X, 
+                selectedPolygon.Move(mousePosition.X - selectedPolygon.CenterOfMass.X,
                     mousePosition.Y - selectedPolygon.CenterOfMass.Y);
             }
             selectedPolygon!.CalculateCenterOfMass();
@@ -91,7 +92,7 @@ namespace PolygonEditor
         }
         private void canvas_MouseClick(object sender, MouseEventArgs e)
         {
-            if(hoveredPolygon != null)
+            if (hoveredPolygon != null)
             {
                 ChangeSelectedPolygon(hoveredPolygon);
                 ChangeHoveredPolygon(null);
@@ -117,12 +118,12 @@ namespace PolygonEditor
             }
             else if (editingPolygon)
             {
-                if(e.Button == MouseButtons.Left)
+                if (e.Button == MouseButtons.Left)
                 {
                     ChangeSelectedVertex(hoveredVertex);
                     ChangeSelectedEdge(hoveredEdge);
                 }
-                if(e.Button == MouseButtons.Right && hoveredVertex != null)
+                if (e.Button == MouseButtons.Right && hoveredVertex != null)
                     selectedPolygon!.RemoveVertex(hoveredVertex);
             }
             if (selectedPolygon != null && selectedPolygon.Vertices.Count == 0)
@@ -160,6 +161,13 @@ namespace PolygonEditor
         private void canvas_MouseDown(object sender, MouseEventArgs e)
         {
             mouseDown = !creatingPolygon;
+            ChangeSelectedVertex(hoveredVertex);
+            if (selectedVertex != null)
+            {
+                ChangeSelectedEdge(null);
+                return;
+            }
+            ChangeSelectedEdge(hoveredEdge);
             if (selectedEdge != null)
                 selectedEdge.ClickPoint = e.Location;
         }
@@ -171,13 +179,14 @@ namespace PolygonEditor
         {
             if (e.KeyCode == Keys.Escape)
             {
+                if (selectedEdge == null && selectedVertex == null)
+                    ChangeSelectedPolygon(null);
                 ChangeSelectedEdge(null);
                 ChangeSelectedVertex(null);
-                //ChangeSelectedPolygon(null);
             }
-            else if (e.KeyCode == Keys.Tab)
+            else if (e.KeyCode == Keys.Tab && polygons.Count != 0)
             {
-                int index = hoveredPolygon == null ? 0 : polygons.IndexOf(hoveredPolygon);
+                int index = selectedPolygon == null ? 0 : polygons.IndexOf(selectedPolygon);
                 ChangeHoveredPolygon(polygons[index == polygons.Count - 1 ? 0 : index + 1]);
             }
             else if (e.KeyCode == Keys.R)
@@ -185,18 +194,12 @@ namespace PolygonEditor
                 polygons.Clear();
                 editingPolygon = false;
                 creatingPolygon = false;
-                hoveredPolygon = null;
                 ChangeHoveredEdge(null);
-                hoveredVertex = null;
-                this.KeyPreview = true;
-            }
-            else if (e.KeyCode == Keys.H && hoveredEdge != null)
-            {
-                hoveredEdge.AddConstraint(Constraint.Horizontal);
-            }
-            else if (e.KeyCode == Keys.V && hoveredEdge != null)
-            {
-                hoveredEdge.AddConstraint(Constraint.Vertical);
+                ChangeSelectedEdge(null);
+                ChangeHoveredPolygon(null);
+                ChangeSelectedPolygon(null);
+                ChangeSelectedVertex(null);
+                ChangeHoveredVertex(null);
             }
             this.canvas.Invalidate();
         }
@@ -250,8 +253,8 @@ namespace PolygonEditor
         }
         private void ChangeHoveredVertex(Vertex? newHoveredVertex)
         {
-            if(selectedPolygon != null)
-                foreach (Vertex vertex in selectedPolygon.Vertices) 
+            if (selectedPolygon != null)
+                foreach (Vertex vertex in selectedPolygon.Vertices)
                     vertex.Hovered = false;
             hoveredVertex = newHoveredVertex;
             if (hoveredVertex != null)

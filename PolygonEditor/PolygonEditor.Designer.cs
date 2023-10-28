@@ -30,8 +30,8 @@
         {
             canvas = new PictureBox();
             mainGroupBox = new GroupBox();
-            horizontalCheckbox = new CheckBox();
             verticalCheckbox = new CheckBox();
+            horizontalCheckbox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)canvas).BeginInit();
             mainGroupBox.SuspendLayout();
             SuspendLayout();
@@ -65,16 +65,6 @@
             mainGroupBox.TabStop = false;
             mainGroupBox.Text = "Editor";
             // 
-            // horizontalCheckbox
-            // 
-            horizontalCheckbox.AutoSize = true;
-            horizontalCheckbox.Location = new Point(6, 26);
-            horizontalCheckbox.Name = "horizontalCheckbox";
-            horizontalCheckbox.Size = new Size(101, 24);
-            horizontalCheckbox.TabIndex = 0;
-            horizontalCheckbox.Text = "Horizontal";
-            horizontalCheckbox.UseVisualStyleBackColor = true;
-            // 
             // verticalCheckbox
             // 
             verticalCheckbox.AutoSize = true;
@@ -84,6 +74,16 @@
             verticalCheckbox.TabIndex = 1;
             verticalCheckbox.Text = "Vertical";
             verticalCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // horizontalCheckbox
+            // 
+            horizontalCheckbox.AutoSize = true;
+            horizontalCheckbox.Location = new Point(6, 26);
+            horizontalCheckbox.Name = "horizontalCheckbox";
+            horizontalCheckbox.Size = new Size(101, 24);
+            horizontalCheckbox.TabIndex = 0;
+            horizontalCheckbox.Text = "Horizontal";
+            horizontalCheckbox.UseVisualStyleBackColor = true;
             // 
             // PolygonEditor
             // 
