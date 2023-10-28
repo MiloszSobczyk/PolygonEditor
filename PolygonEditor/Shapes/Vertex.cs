@@ -13,12 +13,12 @@ namespace PolygonEditor.Shapes
         public static readonly int radius = 10;
         public Vertex(Point point)
         {
-            Selected = false;
             X = point.X;
             Y = point.Y;
             Neighbors = new (Vertex vertex, Constraint constraint)[2];
         }
-        public bool Selected { get; set; }
+        public bool Hovered { get; set; } = false;
+        public bool Selected { get; set; } = false;
         public Vertex(int X, int Y) : this(new Point(X, Y)) { }
         public int X { get; set; }
         public int Y { get; set; }

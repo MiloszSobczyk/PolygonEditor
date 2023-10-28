@@ -16,6 +16,10 @@ namespace PolygonEditor.Shapes
     public class Edge : Shape
     {
         private static readonly double accuracy = 3.0;
+        private static readonly Pen hoveredPen = new Pen(Color.Blue, 3);
+        private static readonly Pen selectedPen = new Pen(Color.Green, 3);
+        public bool Hovered { get; set; } = false;
+        public bool Selected { get; set; } = false;
         public Vertex? Vertex1 { get; set; }
         public Vertex? Vertex2 { get; set; }
         public Point ClickPoint { get; set; }
@@ -35,7 +39,12 @@ namespace PolygonEditor.Shapes
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, Pen pen)
         {
-            e.Graphics.DrawLine(pen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
+            if(this.Hovered)
+                e.Graphics.DrawLine(hoveredPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
+            else if(this.Selected)
+                e.Graphics.DrawLine(selectedPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
+            else
+                e.Graphics.DrawLine(pen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
         }
         public double CalculateDistanceFromEdge(Point point)
         {

@@ -30,6 +30,7 @@ namespace PolygonEditor.Shapes
         public List<Edge> Edges { get; private set; }
         public List<Vertex> Vertices { get; private set; }
         public bool Selected { get; set; } = false;
+        public bool Hovered { get; set; } = false;
         public bool Finished { get; private set; } = false;
         public Polygon(Vertex firstVertex)
         {
@@ -48,7 +49,7 @@ namespace PolygonEditor.Shapes
             {
                 ++EdgeCount;
                 Edges.Add(new Edge(RecentVertex, Vertices[0]));
-                Vertices[0].Selected = false;
+                Vertices[0].Hovered = false;
                 Finished = true;
                 Vertices.Last().Neighbors[1] = (Vertices.First(), Constraint.None);
                 Vertices.First().Neighbors[0] = (Vertices.Last(), Constraint.None);
@@ -109,7 +110,7 @@ namespace PolygonEditor.Shapes
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e)
         {
-            if(Selected)
+            if(Hovered)
             {
                 foreach (Vertex vertex in this.Vertices)
                     vertex.Draw(bitmap, e, brushes["blue"]);
