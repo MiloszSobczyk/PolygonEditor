@@ -61,5 +61,6 @@ namespace PolygonEditor.Shapes
             else
                 e.Graphics.FillEllipse(brush, new Rectangle(X - radius / 2, Y - radius / 2, radius, radius));
         }
+
     }
 }

@@ -26,6 +26,7 @@ namespace PolygonEditor.Shapes
                 { "blue", new SolidBrush(Color.Blue) },
                 { "red", new SolidBrush(Color.Red) },
             };
+        public static int offsetDistance = 5;
         public Point CenterOfMass { get; private set; }
         public int VertexCount { get; private set; } = 0;
         public int EdgeCount { get; private set; } = 0;
@@ -55,7 +56,6 @@ namespace PolygonEditor.Shapes
                 ++EdgeCount;
                 Edges.Add(new Edge(Vertices.Last(), Vertices[0]));
                 Finished = true;
-                CalculateOffset(25.0f);
             }
             else if(!Vertices.Any(v => v.X == x && v.Y == y))
             {
@@ -66,6 +66,7 @@ namespace PolygonEditor.Shapes
                 Edges.Add(new Edge(Vertices[Vertices.Count - 2], newVertex));
                 CalculateCenterOfMass();
             }
+            CalculateOffset();
         }
         public void CalculateCenterOfMass()
         {
@@ -82,6 +83,8 @@ namespace PolygonEditor.Shapes
                 Edges.Clear();
                 if(Vertices.Count != 0) CalculateCenterOfMass();
                 Finished = false;
+                InflatedVertices.Clear();
+                InflatedEdges.Clear();
                 return;
             }
             int index = Vertices.IndexOf(vertex);
@@ -98,6 +101,7 @@ namespace PolygonEditor.Shapes
             Edges.Remove(beforeEdge);
             Vertices.RemoveAt(index);
             CalculateCenterOfMass();
+            CalculateOffset();
         }
         public void Move(int dX, int dY)
         {
@@ -143,12 +147,17 @@ namespace PolygonEditor.Shapes
                 foreach (Edge edge in this.Edges)
                     edge.Draw(bitmap, e, false, useBresenham);
             }
+
+            e.Graphics.FillEllipse(brushes["red"], CenterOfMass.X - 5, CenterOfMass.Y - 5,
+                10, 10);
+        }
+        public void DrawOffset(Bitmap bitmap, PaintEventArgs e)
+        {
+            if (Vertices.Count <= 2) return;
             foreach (Vertex vertex in this.InflatedVertices)
                 vertex.Draw(bitmap, e, brushes["red"]);
             foreach (Edge edge in this.InflatedEdges)
-                edge.Draw(bitmap, e, false, useBresenham);
-            e.Graphics.FillEllipse(brushes["red"], CenterOfMass.X - 5, CenterOfMass.Y - 5,
-                10, 10);
+                edge.Draw(bitmap, e, false);
         }
         public bool IsClockwiseOffset()
         {
@@ -238,7 +247,7 @@ namespace PolygonEditor.Shapes
                 }
             }
         }
-        public void CalculateOffset(float offsetDistance)
+        public void CalculateOffset()
         {
             InflatedVertices.Clear();
             InflatedEdges.Clear();

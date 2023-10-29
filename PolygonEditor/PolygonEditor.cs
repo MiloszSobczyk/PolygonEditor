@@ -60,6 +60,8 @@ namespace PolygonEditor
                 e.Graphics.DrawLine(Polygon.pens["blue"], lastPoint, mousePosition);
                 e.Graphics.FillEllipse(Polygon.brushes["blue"], lastPoint.X - 5, lastPoint.Y - 5, 10, 10);
             }
+            if (drawOffsetCheckbox.Checked)
+                this.polygons.ForEach(polygon => polygon.DrawOffset(bitmap, e));
             e.Graphics.DrawImage(bitmap, 0, 0);
         }
         private void canvas_MouseMove(object sender, MouseEventArgs e)
@@ -107,7 +109,6 @@ namespace PolygonEditor
                 this.canvas.Invalidate();
                 return;
             }
-            selectedPolygon!.CalculateOffset(25.0f);
             selectedPolygon!.CalculateCenterOfMass();
             this.canvas.Invalidate();
         }
@@ -369,6 +370,23 @@ namespace PolygonEditor
         private void bresenhamCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             useBresenham = bresenhamCheckbox.Checked;
+            this.canvas.Invalidate();
+        }
+        private void drawOffsetCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            this.canvas.Invalidate();
+        }
+
+        private void offsetTrackBar_Scroll(object sender, EventArgs e)
+        {
+
+        }
+
+        private void offsetTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            Polygon.offsetDistance = offsetTrackBar.Value;
+            this.offsetLabel.Text = $"Current offset: {offsetTrackBar.Value}";
+            this.polygons.ForEach(polygon => polygon.CalculateOffset());
             this.canvas.Invalidate();
         }
     }
