@@ -16,7 +16,7 @@ namespace PolygonEditor
         }
         public static bool UpdateConstraints(Vertex vertex1, Vertex vertex2, Constraint constraint)
         {
-            if(constraint != Constraint.None)
+            if (constraint != Constraint.None)
             {
                 if (vertex1.Neighbors[0].constraint == constraint) return false;
                 if (vertex2.Neighbors[1].constraint == constraint) return false;

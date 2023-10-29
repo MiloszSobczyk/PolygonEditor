@@ -39,7 +39,7 @@ namespace PolygonEditor.Shapes
         }
         public void SetConstraint(Constraint constraint)
         {
-            if(constraint == Constraint.None)
+            if (constraint == Constraint.None)
             {
                 Constraint = constraint;
                 return;
@@ -48,7 +48,7 @@ namespace PolygonEditor.Shapes
 
             Constraint = constraint;
             UpdateConstraints(constraint);
-            if(constraint == Constraint.Horizontal)
+            if (constraint == Constraint.Horizontal)
                 this.Vertex1.Y = this.Vertex2.Y;
             else
                 this.Vertex1.X = this.Vertex2.X;
@@ -82,10 +82,10 @@ namespace PolygonEditor.Shapes
         }
         public double CalculateDistanceFromEdge(Point point)
         {
-            if (point.X < Math.Min(Vertex1.X, Vertex2.X) - accuracy 
+            if (point.X < Math.Min(Vertex1.X, Vertex2.X) - accuracy
                 || point.X > Math.Max(Vertex1.X, Vertex2.X) + accuracy)
                 return int.MaxValue;
-            if (point.Y < Math.Min(Vertex1.Y, Vertex2.Y) - accuracy 
+            if (point.Y < Math.Min(Vertex1.Y, Vertex2.Y) - accuracy
                 || point.Y > Math.Max(Vertex1.Y, Vertex2.Y) + accuracy)
                 return int.MaxValue;
             double A = point.X - Vertex1.X;

@@ -217,6 +217,26 @@ namespace PolygonEditor
                 selectedEdge.SetConstraint(Constraint.Vertical);
             else if (e.KeyCode == Keys.X && selectedEdge != null)
                 selectedEdge.SetConstraint(Constraint.None);
+            if(e.KeyCode == Keys.H || e.KeyCode == Keys.V || e.KeyCode == Keys.X)
+            {
+                this.noneRadioButton.Checked = false;
+                this.horizontalRadioButton.Checked = false;
+                this.verticalRadioButton.Checked = false;
+
+                this.horizontalRadioButton.Enabled =
+                    selectedEdge.Vertex1.Neighbors[0].constraint != Constraint.Horizontal
+                    && selectedEdge.Vertex2.Neighbors[1].constraint != Constraint.Horizontal;
+                this.verticalRadioButton.Enabled =
+                    selectedEdge.Vertex1.Neighbors[0].constraint != Constraint.Vertical
+                    && selectedEdge.Vertex2.Neighbors[1].constraint != Constraint.Vertical;
+
+                if (selectedEdge.Constraint == Constraint.None)
+                    this.noneRadioButton.Checked = true;
+                else if (selectedEdge.Constraint == Constraint.Horizontal)
+                    this.horizontalRadioButton.Checked = true;
+                else if (selectedEdge.Constraint == Constraint.Vertical)
+                    this.verticalRadioButton.Checked = true;
+            }
             this.canvas.Invalidate();
         }
         private void ChangeHoveredEdge(Edge? newHoveredEdge)
@@ -250,11 +270,11 @@ namespace PolygonEditor
                 this.verticalRadioButton.Checked = false;
 
                 this.horizontalRadioButton.Enabled =
-                    selectedEdge.Vertex1.Neighbors[1].constraint != Constraint.Horizontal
-                    && selectedEdge.Vertex2.Neighbors[0].constraint != Constraint.Horizontal;
+                    selectedEdge.Vertex1.Neighbors[0].constraint != Constraint.Horizontal
+                    && selectedEdge.Vertex2.Neighbors[1].constraint != Constraint.Horizontal;
                 this.verticalRadioButton.Enabled =
-                    selectedEdge.Vertex1.Neighbors[1].constraint != Constraint.Vertical
-                    && selectedEdge.Vertex2.Neighbors[0].constraint != Constraint.Vertical;
+                    selectedEdge.Vertex1.Neighbors[0].constraint != Constraint.Vertical
+                    && selectedEdge.Vertex2.Neighbors[1].constraint != Constraint.Vertical;
 
                 if (selectedEdge.Constraint == Constraint.None)
                     this.noneRadioButton.Checked = true;
@@ -320,14 +340,18 @@ namespace PolygonEditor
         }
         private void noneRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-
+            if(noneRadioButton.Checked)
+                selectedEdge.SetConstraint(Constraint.None);
         }
         private void horizontalRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-
+            if(horizontalRadioButton.Checked)
+                selectedEdge.SetConstraint(Constraint.Horizontal);
         }
         private void verticalRadioButton_CheckedChanged(object sender, EventArgs e)
         {
+            if(verticalRadioButton.Checked)
+                selectedEdge.SetConstraint(Constraint.Vertical);
 
         }
     }
