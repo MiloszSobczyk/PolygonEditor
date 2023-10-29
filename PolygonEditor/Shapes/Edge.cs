@@ -18,6 +18,7 @@ namespace PolygonEditor.Shapes
         private static readonly double accuracy = 3.0;
         private static readonly Pen hoveredPen = new Pen(Color.Blue, 3);
         private static readonly Pen selectedPen = new Pen(Color.Green, 3);
+        private static readonly Pen constraintPen = new Pen(Color.Red, 2);
         public bool Hovered { get; set; } = false;
         public bool Selected { get; set; } = false;
         public Vertex? Vertex1 { get; set; }
@@ -60,12 +61,18 @@ namespace PolygonEditor.Shapes
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, Pen pen)
         {
-            if(this.Selected)
+            if(Selected)
                 e.Graphics.DrawLine(selectedPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
-            else if(this.Hovered)
+            else if(Hovered)
                 e.Graphics.DrawLine(hoveredPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
             else
                 e.Graphics.DrawLine(pen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
+
+            Point middle = new Point((Vertex1.X + Vertex2.X) / 2, (Vertex1.Y + Vertex2.Y) / 2);
+            if (Constraint == Constraint.Horizontal)
+                e.Graphics.DrawLine(constraintPen, middle.X - 10, middle.Y + 4, middle.X + 10, middle.Y + 4);
+            else if(Constraint == Constraint.Vertical) 
+                e.Graphics.DrawLine(constraintPen, middle.X - 4, middle.Y + 22, middle.X - 4, middle.Y + 2);
         }
         public double CalculateDistanceFromEdge(Point point)
         {
