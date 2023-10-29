@@ -25,7 +25,8 @@ namespace PolygonEditor
             vertex2.Neighbors[0] = (vertex1, constraint);
             return true;
         }
-        public static void BresenhamDrawLine(int x1, int y1, int x2, int y2, Color color, PaintEventArgs e)
+        public static void BresenhamDrawLine(int x1, int y1, int x2, int y2, Color color, int width,
+            PaintEventArgs e)
         {
             int dx = Math.Abs(x2 - x1);
             int dy = Math.Abs(y2 - y1);
@@ -37,7 +38,7 @@ namespace PolygonEditor
             {
                 while (true)
                 {
-                    e.Graphics.FillRectangle(brush, x1, y1, 1, 1);
+                    e.Graphics.FillRectangle(brush, x1, y1, width, width);
                     if (x1 == x2 && y1 == y2)
                         break;
                     int err2 = 2 * err;

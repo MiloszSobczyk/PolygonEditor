@@ -123,22 +123,21 @@ namespace PolygonEditor.Shapes
 
             CalculateCenterOfMass();
         }
-        public void Draw(Bitmap bitmap, PaintEventArgs e)
+        public void Draw(Bitmap bitmap, PaintEventArgs e, bool useBresenham = false)
         {
             if(Hovered || Selected)
             {
                 foreach (Vertex vertex in this.Vertices)
                     vertex.Draw(bitmap, e, brushes["blue"]);
                 foreach (Edge edge in this.Edges)
-                    edge.Draw(bitmap, e, pens["blue"]);
+                    edge.Draw(bitmap, e, true, useBresenham);
             }
             else
             {
                 foreach (Vertex vertex in this.Vertices)
                     vertex.Draw(bitmap, e, brushes["black"]);
                 foreach (Edge edge in this.Edges)
-                    edge.Draw(bitmap, e, pens["black"]);
-
+                    edge.Draw(bitmap, e, false, useBresenham);
             }
             e.Graphics.FillEllipse(brushes["red"], CenterOfMass.X - 5, CenterOfMass.Y - 5,
                 10, 10);

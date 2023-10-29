@@ -39,7 +39,7 @@ namespace PolygonEditor
         }
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
-            this.polygons.ForEach(polygon => polygon.Draw(bitmap, e));
+            this.polygons.ForEach(polygon => polygon.Draw(bitmap, e, useBresenham));
             if (creatingPolygon)
             {
                 Point lastPoint = selectedPolygon!.Vertices.Last().Point;
