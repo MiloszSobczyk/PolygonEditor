@@ -76,27 +76,27 @@ namespace PolygonEditor.Shapes
                     e.Graphics.DrawLine(selectedPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
                 else if (Hovered)
                     e.Graphics.DrawLine(hoveredPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
-                else if(polygonHovered)
+                else if (polygonHovered)
                     e.Graphics.DrawLine(thinHoveredPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
                 else
                     e.Graphics.DrawLine(defaultPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
-                Point middle = new Point((Vertex1.X + Vertex2.X) / 2, (Vertex1.Y + Vertex2.Y) / 2);
-                if (Constraint == Constraint.Horizontal)
-                    e.Graphics.DrawLine(constraintPen, middle.X - 10, middle.Y + 4, middle.X + 10, middle.Y + 4);
-                else if (Constraint == Constraint.Vertical)
-                    e.Graphics.DrawLine(constraintPen, middle.X - 4, middle.Y + 22, middle.X - 4, middle.Y + 2);
             }
             else if (useBresenham)
             {
-                if(Selected)
+                if (Selected)
                     Functions.BresenhamDrawLine(Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y, Color.Green, 2, e);
-                else if(Hovered)
+                else if (Hovered)
                     Functions.BresenhamDrawLine(Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y, Color.Blue, 2, e);
                 else if (polygonHovered)
                     Functions.BresenhamDrawLine(Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y, Color.Blue, 1, e);
                 else
                     Functions.BresenhamDrawLine(Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y, Color.Black, 1, e);
             }
+            Point middle = new Point((Vertex1.X + Vertex2.X) / 2, (Vertex1.Y + Vertex2.Y) / 2);
+            if (Constraint == Constraint.Horizontal)
+                e.Graphics.DrawLine(constraintPen, middle.X - 10, middle.Y + 4, middle.X + 10, middle.Y + 4);
+            else if (Constraint == Constraint.Vertical)
+                e.Graphics.DrawLine(constraintPen, middle.X - 4, middle.Y + 22, middle.X - 4, middle.Y + 2);
         }
         public double CalculateDistanceFromEdge(Point point)
         {

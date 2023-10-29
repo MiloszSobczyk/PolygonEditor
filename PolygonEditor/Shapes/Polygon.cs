@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +32,7 @@ namespace PolygonEditor.Shapes
         public List<Edge> Edges { get; private set; }
         public List<Vertex> Vertices { get; private set; }
         public List<Edge> InflatedEdges { get; private set; }
-        public List<Vertex> InflatedVerties { get; private set; }
+        public List<Vertex> InflatedVertices { get; private set; }
         public bool Selected { get; set; } = false;
         public bool Hovered { get; set; } = false;
         public bool Finished { get; private set; } = false;
@@ -43,7 +46,7 @@ namespace PolygonEditor.Shapes
             ++VertexCount;
             CenterOfMass = firstVertex.Point;
             InflatedEdges = new List<Edge>();
-            InflatedVerties = new List<Vertex>();
+            InflatedVertices = new List<Vertex>();
         }
         public void AddVertex(int x, int y, bool connectToFirst = false)
         {
@@ -52,6 +55,7 @@ namespace PolygonEditor.Shapes
                 ++EdgeCount;
                 Edges.Add(new Edge(Vertices.Last(), Vertices[0]));
                 Finished = true;
+                CalculateOffset(25.0f);
             }
             else if(!Vertices.Any(v => v.X == x && v.Y == y))
             {
@@ -139,8 +143,155 @@ namespace PolygonEditor.Shapes
                 foreach (Edge edge in this.Edges)
                     edge.Draw(bitmap, e, false, useBresenham);
             }
+            foreach (Vertex vertex in this.InflatedVertices)
+                vertex.Draw(bitmap, e, brushes["red"]);
+            foreach (Edge edge in this.InflatedEdges)
+                edge.Draw(bitmap, e, false, useBresenham);
             e.Graphics.FillEllipse(brushes["red"], CenterOfMass.X - 5, CenterOfMass.Y - 5,
                 10, 10);
+        }
+        public bool IsClockwiseOffset()
+        {
+            int sum = 0;
+            for(int i = 0; i < this.Vertices.Count; i++)
+            {
+                Vertex current = Vertices[i];
+                Vertex next = Vertices[(i + 1) % Vertices.Count];
+
+                sum += (next.X - current.X) * (next.Y + current.Y);
+            }
+            return sum > 0;
+        }
+        public bool IsOnConvexHull(Vertex vertex, List<Vertex> convexHull)
+        {
+            return convexHull.Any(c => c.Point == vertex.Point);
+        }
+        public Point CalculateIntersestionPoint(Point p1, Point p2, Point p3, Point p4)
+        {
+            float m1 = (float)(p2.Y - p1.Y) / (p2.X - p1.X);
+            float m2 = (float)(p4.Y - p3.Y) / (p4.X - p3.X);
+
+            float x = (m1 * p1.X - m2 * p3.X + p3.Y - p1.Y) / (m1 - m2);
+            float y = m1 * (x - p1.X) + p1.Y;
+
+            return new Point((int)x, (int)y);
+        }
+        public bool DoLineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4)
+        {
+            int x1 = p1.X;
+            int y1 = p1.Y;
+            int x2 = p2.X;
+            int y2 = p2.Y;
+            int x3 = p3.X;
+            int y3 = p3.Y;
+            int x4 = p4.X;
+            int y4 = p4.Y;
+
+            int crossProduct1 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+            int crossProduct2 = (x2 - x1) * (y4 - y1) - (y2 - y1) * (x4 - x1);
+
+            if ((crossProduct1 > 0 && crossProduct2 < 0) || (crossProduct1 < 0 && crossProduct2 > 0))
+            {
+                int crossProduct3 = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
+                int crossProduct4 = (x4 - x3) * (y2 - y3) - (y4 - y3) * (x2 - x3);
+
+                if ((crossProduct3 > 0 && crossProduct4 < 0) || (crossProduct3 < 0 && crossProduct4 > 0))
+                    return true;
+            }
+            return false;
+        }
+        public void ResolveSelfIntersections()
+        {
+            for (int i = 0; i < InflatedVertices.Count; i++)
+            {
+                Vertex vertexA = InflatedVertices[i];
+                Vertex vertexB = InflatedVertices[(i + 1) % InflatedVertices.Count];
+
+                for (int j = i + 2; j < InflatedVertices.Count; j++)
+                {
+                    Vertex vertexC = InflatedVertices[j];
+                    Vertex vertexD = InflatedVertices[(j + 1) % InflatedVertices.Count];
+
+                    if (DoLineSegmentsIntersect(vertexA.Point, vertexB.Point, vertexC.Point, vertexD.Point))
+                    {
+                        Point intersectionPoint = CalculateIntersestionPoint(vertexA.Point, vertexB.Point, vertexC.Point, vertexD.Point);
+
+                        Vertex newVertex1 = new Vertex(intersectionPoint);
+                        newVertex1.Neighbors[0].vertex = vertexA;
+                        newVertex1.Neighbors[1].vertex = vertexC;
+                        Vertex newVertex2 = new Vertex(intersectionPoint);
+                        newVertex2.Neighbors[0].vertex = vertexB;
+                        newVertex2.Neighbors[1].vertex = vertexD;
+
+                        vertexA.Neighbors[1].vertex = newVertex1;
+                        vertexC.Neighbors[0].vertex = newVertex1;
+                        vertexB.Neighbors[1].vertex = newVertex2;
+                        vertexD.Neighbors[0].vertex = newVertex2;
+
+                        InflatedVertices.RemoveRange(i + 1, j - i);
+
+                        InflatedVertices.Insert(i, newVertex1);
+                        InflatedVertices.Insert(i + 1, newVertex2);
+
+                        ResolveSelfIntersections();
+                    }
+                }
+            }
+        }
+        public void CalculateOffset(float offsetDistance)
+        {
+            InflatedVertices.Clear();
+            InflatedEdges.Clear();
+            for (int i = 0; i < Vertices.Count; i++)
+            {
+                Vertex currentVertex = Vertices[i];
+                Vertex prevVertex = Vertices[(i - 1 + Vertices.Count) % Vertices.Count];
+                Vertex nextVertex = Vertices[(i + 1) % Vertices.Count];
+
+                Vector2 edge = new Vector2(nextVertex.Point.X - currentVertex.Point.X, nextVertex.Point.Y - currentVertex.Point.Y);
+                Vector2 prevEdge = new Vector2(currentVertex.Point.X - prevVertex.Point.X, currentVertex.Point.Y - prevVertex.Point.Y);
+
+                Vector2 edgeNormal = new Vector2(-edge.Y, edge.X);
+                Vector2 prevEdgeNormal = new Vector2(-prevEdge.Y, prevEdge.X);
+
+
+                if (IsClockwiseOffset())
+                {
+                    edgeNormal = Vector2.Normalize(edgeNormal);
+                    prevEdgeNormal = Vector2.Normalize(prevEdgeNormal);
+                }
+                else
+                {
+                    edgeNormal = Vector2.Normalize(-edgeNormal);
+                    prevEdgeNormal = Vector2.Normalize(-prevEdgeNormal);
+                }
+
+
+                Vector2 offsetVector = edgeNormal + prevEdgeNormal;
+                offsetVector = Vector2.Normalize(offsetVector);
+
+                Point offsetPoint = new Point(
+                    (int)(currentVertex.Point.X + offsetVector.X * offsetDistance),
+                    (int)(currentVertex.Point.Y + offsetVector.Y * offsetDistance));
+
+                bool isConvexHullVertex = IsOnConvexHull(currentVertex, Vertices);
+
+                if (isConvexHullVertex) InflatedVertices.Add(new Vertex(offsetPoint));
+                else InflatedVertices.Add(currentVertex);
+            }
+
+            for (int i = 0; i < InflatedVertices.Count; i++)
+            {
+                int prevIndex = (i - 1 + InflatedVertices.Count) % InflatedVertices.Count;
+                int nextIndex = (i + 1) % InflatedVertices.Count;
+
+                InflatedVertices[i].Neighbors[0].vertex = InflatedVertices[prevIndex];
+                InflatedVertices[i].Neighbors[1].vertex = InflatedVertices[nextIndex];
+            }
+
+            ResolveSelfIntersections();
+            for(int i = 0; i < InflatedVertices.Count; ++i)
+                InflatedEdges.Add(new Edge(InflatedVertices[i], InflatedVertices[(i + 1) % InflatedVertices.Count]));
         }
     }
 }

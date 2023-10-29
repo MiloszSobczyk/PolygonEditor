@@ -30,7 +30,7 @@
         {
             canvas = new PictureBox();
             mainGroupBox = new GroupBox();
-            algorithmComboBox = new ComboBox();
+            bresenhamCheckbox = new CheckBox();
             verticalRadioButton = new RadioButton();
             horizontalRadioButton = new RadioButton();
             noneRadioButton = new RadioButton();
@@ -59,7 +59,7 @@
             // 
             // mainGroupBox
             // 
-            mainGroupBox.Controls.Add(algorithmComboBox);
+            mainGroupBox.Controls.Add(bresenhamCheckbox);
             mainGroupBox.Controls.Add(verticalRadioButton);
             mainGroupBox.Controls.Add(horizontalRadioButton);
             mainGroupBox.Controls.Add(noneRadioButton);
@@ -72,15 +72,16 @@
             mainGroupBox.TabIndex = 1;
             mainGroupBox.TabStop = false;
             // 
-            // algorithmComboBox
+            // bresenhamCheckbox
             // 
-            algorithmComboBox.FormattingEnabled = true;
-            algorithmComboBox.Items.AddRange(new object[] { "Library algorithm", "Bresenham's algorithm" });
-            algorithmComboBox.Location = new Point(6, 46);
-            algorithmComboBox.Name = "algorithmComboBox";
-            algorithmComboBox.Size = new Size(221, 28);
-            algorithmComboBox.TabIndex = 9;
-            algorithmComboBox.SelectedIndexChanged += algorithmComboBox_SelectedIndexChanged;
+            bresenhamCheckbox.AutoSize = true;
+            bresenhamCheckbox.Location = new Point(6, 46);
+            bresenhamCheckbox.Name = "bresenhamCheckbox";
+            bresenhamCheckbox.Size = new Size(210, 24);
+            bresenhamCheckbox.TabIndex = 9;
+            bresenhamCheckbox.Text = "Use Bresenham's algorithm";
+            bresenhamCheckbox.UseVisualStyleBackColor = true;
+            bresenhamCheckbox.CheckedChanged += bresenhamCheckbox_CheckedChanged;
             // 
             // verticalRadioButton
             // 
@@ -167,6 +168,6 @@
         private RadioButton verticalRadioButton;
         private RadioButton horizontalRadioButton;
         private RadioButton noneRadioButton;
-        private ComboBox algorithmComboBox;
+        private CheckBox bresenhamCheckbox;
     }
 }

@@ -53,6 +53,7 @@ namespace PolygonEditor.Shapes
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, Brush brush)
         {
+            if (X == int.MaxValue || X == int.MinValue || Y == int.MaxValue || Y == int.MinValue) return;
             if (Hovered)
                 e.Graphics.FillEllipse(activeBrush, new Rectangle(X - radius / 2, Y - radius / 2, radius, radius));
             else if (Selected)

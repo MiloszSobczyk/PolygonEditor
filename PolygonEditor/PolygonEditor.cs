@@ -35,7 +35,21 @@ namespace PolygonEditor
             p1.AddVertex(300, 300);
             p1.AddVertex(100, 300);
             p1.AddVertex(100, 100, true);
+            p1.Edges[0].SetConstraint(Constraint.Horizontal);
+            p1.Edges[1].SetConstraint(Constraint.Vertical);
             polygons.Add(p1);
+
+            Polygon p2 = new Polygon(new Vertex(650, 400));
+            p2.AddVertex(300, 400);
+            p2.AddVertex(400, 200);
+            p2.AddVertex(400, 100);
+            p2.AddVertex(550, 150);
+            p2.AddVertex(550, 200);
+            p2.AddVertex(650, 600, true);
+            p2.Edges[0].SetConstraint(Constraint.Horizontal);
+            p2.Edges[2].SetConstraint(Constraint.Vertical);
+            p2.Edges[4].SetConstraint(Constraint.Vertical);
+            polygons.Add(p2);
         }
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
@@ -88,6 +102,12 @@ namespace PolygonEditor
                 selectedPolygon.Move(mousePosition.X - selectedPolygon.CenterOfMass.X,
                     mousePosition.Y - selectedPolygon.CenterOfMass.Y);
             }
+            else
+            {
+                this.canvas.Invalidate();
+                return;
+            }
+            selectedPolygon!.CalculateOffset(25.0f);
             selectedPolygon!.CalculateCenterOfMass();
             this.canvas.Invalidate();
         }
@@ -194,7 +214,7 @@ namespace PolygonEditor
                 creatingPolygon = false;
                 editingPolygon = false;
             }
-            else if (e.KeyCode == Keys.Tab && polygons.Count != 0)
+            else if (e.KeyCode == Keys.N && polygons.Count > 0)
             {
                 int index = selectedPolygon == null ? 0 : polygons.IndexOf(selectedPolygon);
                 ChangeHoveredPolygon(polygons[index == polygons.Count - 1 ? 0 : index + 1]);
@@ -346,9 +366,9 @@ namespace PolygonEditor
                 selectedEdge.SetConstraint(Constraint.Vertical);
 
         }
-        private void algorithmComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void bresenhamCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            useBresenham = this.algorithmComboBox.SelectedIndex == 1;
+            useBresenham = bresenhamCheckbox.Checked;
             this.canvas.Invalidate();
         }
     }
