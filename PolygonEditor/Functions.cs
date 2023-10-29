@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 
 namespace PolygonEditor
 {
@@ -24,39 +25,32 @@ namespace PolygonEditor
             vertex2.Neighbors[0] = (vertex1, constraint);
             return true;
         }
-        public static void BresenhamDrawLine(int x1, int y1, int x2, int y2, Color color)
+        public static void BresenhamDrawLine(int x1, int y1, int x2, int y2, Color color, PaintEventArgs e)
         {
-            int w = x2 - x1;
-            int h = y2 - y1;
-            int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
-            if (w < 0) dx1 = -1; else if (w > 0) dx1 = 1;
-            if (h < 0) dy1 = -1; else if (h > 0) dy1 = 1;
-            if (w < 0) dx2 = -1; else if (w > 0) dx2 = 1;
-            int longest = Math.Abs(w);
-            int shortest = Math.Abs(h);
-            if (!(longest > shortest))
+            int dx = Math.Abs(x2 - x1);
+            int dy = Math.Abs(y2 - y1);
+            int sx = (x1 < x2) ? 1 : -1;
+            int sy = (y1 < y2) ? 1 : -1;
+            int err = dx - dy;
+
+            using (SolidBrush brush = new SolidBrush(color))
             {
-                longest = Math.Abs(h);
-                shortest = Math.Abs(w);
-                if (h < 0) dy2 = -1; else if (h > 0) dy2 = 1;
-                dx2 = 0;
-            }
-            int numerator = longest >> 1;
-            for (int i = 0; i <= longest; i++)
-            {
-                
-                //putpixel(x, y, color);
-                numerator += shortest;
-                if (!(numerator < longest))
+                while (true)
                 {
-                    numerator -= longest;
-                    x1 += dx1;
-                    y1 += dy1;
-                }
-                else
-                {
-                    x1 += dx2;
-                    y1 += dy2;
+                    e.Graphics.FillRectangle(brush, x1, y1, 1, 1);
+                    if (x1 == x2 && y1 == y2)
+                        break;
+                    int err2 = 2 * err;
+                    if (err2 > -dy)
+                    {
+                        err -= dy;
+                        x1 += sx;
+                    }
+                    if (err2 < dx)
+                    {
+                        err += dx;
+                        y1 += sy;
+                    }
                 }
             }
         }

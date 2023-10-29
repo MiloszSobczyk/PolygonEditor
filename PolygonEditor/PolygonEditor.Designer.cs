@@ -30,8 +30,13 @@
         {
             canvas = new PictureBox();
             mainGroupBox = new GroupBox();
-            verticalCheckbox = new CheckBox();
-            horizontalCheckbox = new CheckBox();
+            verticalRadioButton = new RadioButton();
+            horizontalRadioButton = new RadioButton();
+            noneRadioButton = new RadioButton();
+            edgeConstraintLabel = new Label();
+            bresenhamRadioButton = new RadioButton();
+            libraryRadioButton = new RadioButton();
+            LineLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)canvas).BeginInit();
             mainGroupBox.SuspendLayout();
             SuspendLayout();
@@ -55,37 +60,103 @@
             // 
             // mainGroupBox
             // 
-            mainGroupBox.Controls.Add(verticalCheckbox);
-            mainGroupBox.Controls.Add(horizontalCheckbox);
+            mainGroupBox.Controls.Add(verticalRadioButton);
+            mainGroupBox.Controls.Add(horizontalRadioButton);
+            mainGroupBox.Controls.Add(noneRadioButton);
+            mainGroupBox.Controls.Add(edgeConstraintLabel);
+            mainGroupBox.Controls.Add(bresenhamRadioButton);
+            mainGroupBox.Controls.Add(libraryRadioButton);
+            mainGroupBox.Controls.Add(LineLabel);
             mainGroupBox.Location = new Point(703, 0);
             mainGroupBox.Name = "mainGroupBox";
             mainGroupBox.RightToLeft = RightToLeft.No;
             mainGroupBox.Size = new Size(235, 593);
             mainGroupBox.TabIndex = 1;
             mainGroupBox.TabStop = false;
-            mainGroupBox.Text = "Editor";
             // 
-            // verticalCheckbox
+            // verticalRadioButton
             // 
-            verticalCheckbox.AutoSize = true;
-            verticalCheckbox.Location = new Point(6, 56);
-            verticalCheckbox.Name = "verticalCheckbox";
-            verticalCheckbox.Size = new Size(80, 24);
-            verticalCheckbox.TabIndex = 1;
-            verticalCheckbox.Text = "Vertical";
-            verticalCheckbox.UseVisualStyleBackColor = true;
-            verticalCheckbox.Visible = false;
+            verticalRadioButton.AutoSize = true;
+            verticalRadioButton.Location = new Point(6, 202);
+            verticalRadioButton.Name = "verticalRadioButton";
+            verticalRadioButton.Size = new Size(79, 24);
+            verticalRadioButton.TabIndex = 8;
+            verticalRadioButton.TabStop = true;
+            verticalRadioButton.Text = "Vertical";
+            verticalRadioButton.UseVisualStyleBackColor = true;
+            verticalRadioButton.Visible = false;
+            verticalRadioButton.CheckedChanged += verticalRadioButton_CheckedChanged;
             // 
-            // horizontalCheckbox
+            // horizontalRadioButton
             // 
-            horizontalCheckbox.AutoSize = true;
-            horizontalCheckbox.Location = new Point(6, 26);
-            horizontalCheckbox.Name = "horizontalCheckbox";
-            horizontalCheckbox.Size = new Size(101, 24);
-            horizontalCheckbox.TabIndex = 0;
-            horizontalCheckbox.Text = "Horizontal";
-            horizontalCheckbox.UseVisualStyleBackColor = true;
-            horizontalCheckbox.Visible = false;
+            horizontalRadioButton.AutoSize = true;
+            horizontalRadioButton.Location = new Point(6, 172);
+            horizontalRadioButton.Name = "horizontalRadioButton";
+            horizontalRadioButton.Size = new Size(100, 24);
+            horizontalRadioButton.TabIndex = 7;
+            horizontalRadioButton.TabStop = true;
+            horizontalRadioButton.Text = "Horizontal";
+            horizontalRadioButton.UseVisualStyleBackColor = true;
+            horizontalRadioButton.Visible = false;
+            horizontalRadioButton.CheckedChanged += horizontalRadioButton_CheckedChanged;
+            // 
+            // noneRadioButton
+            // 
+            noneRadioButton.AutoSize = true;
+            noneRadioButton.Location = new Point(6, 142);
+            noneRadioButton.Name = "noneRadioButton";
+            noneRadioButton.Size = new Size(66, 24);
+            noneRadioButton.TabIndex = 6;
+            noneRadioButton.TabStop = true;
+            noneRadioButton.Text = "None";
+            noneRadioButton.UseVisualStyleBackColor = true;
+            noneRadioButton.Visible = false;
+            noneRadioButton.CheckedChanged += noneRadioButton_CheckedChanged;
+            // 
+            // edgeConstraintLabel
+            // 
+            edgeConstraintLabel.AutoSize = true;
+            edgeConstraintLabel.Location = new Point(0, 119);
+            edgeConstraintLabel.Name = "edgeConstraintLabel";
+            edgeConstraintLabel.Size = new Size(112, 20);
+            edgeConstraintLabel.TabIndex = 5;
+            edgeConstraintLabel.Text = "Edge constraint";
+            edgeConstraintLabel.Visible = false;
+            // 
+            // bresenhamRadioButton
+            // 
+            bresenhamRadioButton.AutoSize = true;
+            bresenhamRadioButton.Location = new Point(6, 76);
+            bresenhamRadioButton.Name = "bresenhamRadioButton";
+            bresenhamRadioButton.RightToLeft = RightToLeft.No;
+            bresenhamRadioButton.Size = new Size(181, 24);
+            bresenhamRadioButton.TabIndex = 4;
+            bresenhamRadioButton.TabStop = true;
+            bresenhamRadioButton.Text = "Bresenham's algorithm";
+            bresenhamRadioButton.UseVisualStyleBackColor = true;
+            bresenhamRadioButton.CheckedChanged += bresenhamRadioButton_CheckedChanged;
+            // 
+            // libraryRadioButton
+            // 
+            libraryRadioButton.AutoSize = true;
+            libraryRadioButton.Checked = true;
+            libraryRadioButton.Location = new Point(6, 46);
+            libraryRadioButton.Name = "libraryRadioButton";
+            libraryRadioButton.Size = new Size(144, 24);
+            libraryRadioButton.TabIndex = 3;
+            libraryRadioButton.TabStop = true;
+            libraryRadioButton.Text = "Library algorithm";
+            libraryRadioButton.UseVisualStyleBackColor = true;
+            libraryRadioButton.CheckedChanged += libraryRadioButton_CheckedChanged;
+            // 
+            // LineLabel
+            // 
+            LineLabel.AutoSize = true;
+            LineLabel.Location = new Point(0, 23);
+            LineLabel.Name = "LineLabel";
+            LineLabel.Size = new Size(163, 20);
+            LineLabel.TabIndex = 2;
+            LineLabel.Text = "Line drawing algorithm";
             // 
             // PolygonEditor
             // 
@@ -109,7 +180,12 @@
 
         private PictureBox canvas;
         private GroupBox mainGroupBox;
-        private CheckBox verticalCheckbox;
-        private CheckBox horizontalCheckbox;
+        private Label LineLabel;
+        private Label edgeConstraintLabel;
+        private RadioButton bresenhamRadioButton;
+        private RadioButton libraryRadioButton;
+        private RadioButton verticalRadioButton;
+        private RadioButton horizontalRadioButton;
+        private RadioButton noneRadioButton;
     }
 }

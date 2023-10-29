@@ -44,8 +44,7 @@ namespace PolygonEditor.Shapes
                 Constraint = constraint;
                 return;
             }
-            if (constraint == Vertex1.Neighbors[1].constraint 
-                || constraint == Vertex2.Neighbors[0].constraint) return;
+            if (!CheckConstraintPossibility(constraint)) return;
 
             Constraint = constraint;
             UpdateConstraints(constraint);
@@ -54,6 +53,12 @@ namespace PolygonEditor.Shapes
             else
                 this.Vertex1.X = this.Vertex2.X;
         }
+        public bool CheckConstraintPossibility(Constraint constraint)
+        {
+            if (constraint == Constraint.None) return true;
+            return !(constraint == Vertex1.Neighbors[0].constraint
+                || constraint == Vertex2.Neighbors[1].constraint);
+        }
         public void Move(int dX, int dY)
         {
             this.Vertex1!.MoveAtEdge(dX, dY, 0);
@@ -61,9 +66,10 @@ namespace PolygonEditor.Shapes
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, Pen pen)
         {
-            if(Selected)
+            //Functions.BresenhamDrawLine(Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y, Color.Black, e);
+            if (Selected)
                 e.Graphics.DrawLine(selectedPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
-            else if(Hovered)
+            else if (Hovered)
                 e.Graphics.DrawLine(hoveredPen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
             else
                 e.Graphics.DrawLine(pen, Vertex1.X, Vertex1.Y, Vertex2.X, Vertex2.Y);
@@ -71,7 +77,7 @@ namespace PolygonEditor.Shapes
             Point middle = new Point((Vertex1.X + Vertex2.X) / 2, (Vertex1.Y + Vertex2.Y) / 2);
             if (Constraint == Constraint.Horizontal)
                 e.Graphics.DrawLine(constraintPen, middle.X - 10, middle.Y + 4, middle.X + 10, middle.Y + 4);
-            else if(Constraint == Constraint.Vertical) 
+            else if (Constraint == Constraint.Vertical)
                 e.Graphics.DrawLine(constraintPen, middle.X - 4, middle.Y + 22, middle.X - 4, middle.Y + 2);
         }
         public double CalculateDistanceFromEdge(Point point)

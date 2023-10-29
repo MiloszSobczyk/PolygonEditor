@@ -7,8 +7,9 @@ namespace PolygonEditor
     public partial class PolygonEditor : Form
     {
         private readonly List<Polygon> polygons;
-        private bool creatingPolygon = false; // selectedPolygon.Finished
-        private bool editingPolygon = false; // !selectedPolygon.Finished
+        private bool useBresenham = false;
+        private bool creatingPolygon = false;
+        private bool editingPolygon = false;
         private bool mouseDown = false;
         private Polygon? hoveredPolygon = null;
         private Polygon? selectedPolygon = null;
@@ -228,18 +229,39 @@ namespace PolygonEditor
         }
         private void ChangeSelectedEdge(Edge? newSelectedEdge)
         {
-            this.horizontalCheckbox.Visible = false;
-            this.verticalCheckbox.Visible = false;
+            this.edgeConstraintLabel.Visible = false;
+            this.noneRadioButton.Visible = false;
+            this.horizontalRadioButton.Visible = false;
+            this.verticalRadioButton.Visible = false;
             if (selectedEdge != null)
                 selectedEdge.Selected = false;
             selectedEdge = newSelectedEdge;
             if (selectedEdge != null)
             {
                 selectedEdge.Selected = true;
-                this.horizontalCheckbox.Visible = true;
-                this.verticalCheckbox.Visible = true;
-                this.horizontalCheckbox.Checked = selectedEdge.Constraint == Constraint.Horizontal;
-                this.verticalCheckbox.Checked = selectedEdge.Constraint == Constraint.Vertical;
+
+                this.edgeConstraintLabel.Visible = true;
+                this.noneRadioButton.Visible = true;
+                this.horizontalRadioButton.Visible = true;
+                this.verticalRadioButton.Visible = true;
+
+                this.noneRadioButton.Checked = false;
+                this.horizontalRadioButton.Checked = false;
+                this.verticalRadioButton.Checked = false;
+
+                this.horizontalRadioButton.Enabled =
+                    selectedEdge.Vertex1.Neighbors[1].constraint != Constraint.Horizontal
+                    && selectedEdge.Vertex2.Neighbors[0].constraint != Constraint.Horizontal;
+                this.verticalRadioButton.Enabled =
+                    selectedEdge.Vertex1.Neighbors[1].constraint != Constraint.Vertical
+                    && selectedEdge.Vertex2.Neighbors[0].constraint != Constraint.Vertical;
+
+                if (selectedEdge.Constraint == Constraint.None)
+                    this.noneRadioButton.Checked = true;
+                else if (selectedEdge.Constraint == Constraint.Horizontal)
+                    this.horizontalRadioButton.Checked = true;
+                else if (selectedEdge.Constraint == Constraint.Vertical)
+                    this.verticalRadioButton.Checked = true;
             }
         }
         private void ChangeHoveredPolygon(Polygon? newHoveredPolygon)
@@ -288,7 +310,23 @@ namespace PolygonEditor
                 selectedVertex.Selected = true;
             this.canvas.Invalidate();
         }
-        private void horizontalCheckbox_CheckedChanged(object sender, EventArgs e)
+        private void libraryRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            useBresenham = bresenhamRadioButton.Checked;
+        }
+        private void bresenhamRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            useBresenham = bresenhamRadioButton.Checked;
+        }
+        private void noneRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+        private void horizontalRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+        private void verticalRadioButton_CheckedChanged(object sender, EventArgs e)
         {
 
         }
