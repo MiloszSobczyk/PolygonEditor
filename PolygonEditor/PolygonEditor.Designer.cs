@@ -30,12 +30,11 @@
         {
             canvas = new PictureBox();
             mainGroupBox = new GroupBox();
+            algorithmComboBox = new ComboBox();
             verticalRadioButton = new RadioButton();
             horizontalRadioButton = new RadioButton();
             noneRadioButton = new RadioButton();
             edgeConstraintLabel = new Label();
-            bresenhamRadioButton = new RadioButton();
-            libraryRadioButton = new RadioButton();
             LineLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)canvas).BeginInit();
             mainGroupBox.SuspendLayout();
@@ -60,12 +59,11 @@
             // 
             // mainGroupBox
             // 
+            mainGroupBox.Controls.Add(algorithmComboBox);
             mainGroupBox.Controls.Add(verticalRadioButton);
             mainGroupBox.Controls.Add(horizontalRadioButton);
             mainGroupBox.Controls.Add(noneRadioButton);
             mainGroupBox.Controls.Add(edgeConstraintLabel);
-            mainGroupBox.Controls.Add(bresenhamRadioButton);
-            mainGroupBox.Controls.Add(libraryRadioButton);
             mainGroupBox.Controls.Add(LineLabel);
             mainGroupBox.Location = new Point(703, 0);
             mainGroupBox.Name = "mainGroupBox";
@@ -74,10 +72,20 @@
             mainGroupBox.TabIndex = 1;
             mainGroupBox.TabStop = false;
             // 
+            // algorithmComboBox
+            // 
+            algorithmComboBox.FormattingEnabled = true;
+            algorithmComboBox.Items.AddRange(new object[] { "Library algorithm", "Bresenham's algorithm" });
+            algorithmComboBox.Location = new Point(6, 46);
+            algorithmComboBox.Name = "algorithmComboBox";
+            algorithmComboBox.Size = new Size(221, 28);
+            algorithmComboBox.TabIndex = 9;
+            algorithmComboBox.SelectedIndexChanged += algorithmComboBox_SelectedIndexChanged;
+            // 
             // verticalRadioButton
             // 
             verticalRadioButton.AutoSize = true;
-            verticalRadioButton.Location = new Point(6, 202);
+            verticalRadioButton.Location = new Point(6, 170);
             verticalRadioButton.Name = "verticalRadioButton";
             verticalRadioButton.Size = new Size(79, 24);
             verticalRadioButton.TabIndex = 8;
@@ -90,7 +98,7 @@
             // horizontalRadioButton
             // 
             horizontalRadioButton.AutoSize = true;
-            horizontalRadioButton.Location = new Point(6, 172);
+            horizontalRadioButton.Location = new Point(6, 140);
             horizontalRadioButton.Name = "horizontalRadioButton";
             horizontalRadioButton.Size = new Size(100, 24);
             horizontalRadioButton.TabIndex = 7;
@@ -103,7 +111,7 @@
             // noneRadioButton
             // 
             noneRadioButton.AutoSize = true;
-            noneRadioButton.Location = new Point(6, 142);
+            noneRadioButton.Location = new Point(6, 110);
             noneRadioButton.Name = "noneRadioButton";
             noneRadioButton.Size = new Size(66, 24);
             noneRadioButton.TabIndex = 6;
@@ -116,38 +124,12 @@
             // edgeConstraintLabel
             // 
             edgeConstraintLabel.AutoSize = true;
-            edgeConstraintLabel.Location = new Point(0, 119);
+            edgeConstraintLabel.Location = new Point(0, 87);
             edgeConstraintLabel.Name = "edgeConstraintLabel";
             edgeConstraintLabel.Size = new Size(112, 20);
             edgeConstraintLabel.TabIndex = 5;
             edgeConstraintLabel.Text = "Edge constraint";
             edgeConstraintLabel.Visible = false;
-            // 
-            // bresenhamRadioButton
-            // 
-            bresenhamRadioButton.AutoSize = true;
-            bresenhamRadioButton.Location = new Point(6, 76);
-            bresenhamRadioButton.Name = "bresenhamRadioButton";
-            bresenhamRadioButton.RightToLeft = RightToLeft.No;
-            bresenhamRadioButton.Size = new Size(181, 24);
-            bresenhamRadioButton.TabIndex = 4;
-            bresenhamRadioButton.TabStop = true;
-            bresenhamRadioButton.Text = "Bresenham's algorithm";
-            bresenhamRadioButton.UseVisualStyleBackColor = true;
-            bresenhamRadioButton.CheckedChanged += bresenhamRadioButton_CheckedChanged;
-            // 
-            // libraryRadioButton
-            // 
-            libraryRadioButton.AutoSize = true;
-            libraryRadioButton.Checked = true;
-            libraryRadioButton.Location = new Point(6, 46);
-            libraryRadioButton.Name = "libraryRadioButton";
-            libraryRadioButton.Size = new Size(144, 24);
-            libraryRadioButton.TabIndex = 3;
-            libraryRadioButton.TabStop = true;
-            libraryRadioButton.Text = "Library algorithm";
-            libraryRadioButton.UseVisualStyleBackColor = true;
-            libraryRadioButton.CheckedChanged += libraryRadioButton_CheckedChanged;
             // 
             // LineLabel
             // 
@@ -182,10 +164,9 @@
         private GroupBox mainGroupBox;
         private Label LineLabel;
         private Label edgeConstraintLabel;
-        private RadioButton bresenhamRadioButton;
-        private RadioButton libraryRadioButton;
         private RadioButton verticalRadioButton;
         private RadioButton horizontalRadioButton;
         private RadioButton noneRadioButton;
+        private ComboBox algorithmComboBox;
     }
 }

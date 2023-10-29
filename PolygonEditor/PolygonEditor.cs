@@ -217,7 +217,7 @@ namespace PolygonEditor
                 selectedEdge.SetConstraint(Constraint.Vertical);
             else if (e.KeyCode == Keys.X && selectedEdge != null)
                 selectedEdge.SetConstraint(Constraint.None);
-            if(e.KeyCode == Keys.H || e.KeyCode == Keys.V || e.KeyCode == Keys.X)
+            if (e.KeyCode == Keys.H || e.KeyCode == Keys.V || e.KeyCode == Keys.X)
             {
                 this.noneRadioButton.Checked = false;
                 this.horizontalRadioButton.Checked = false;
@@ -330,29 +330,26 @@ namespace PolygonEditor
                 selectedVertex.Selected = true;
             this.canvas.Invalidate();
         }
-        private void libraryRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            useBresenham = bresenhamRadioButton.Checked;
-        }
-        private void bresenhamRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            useBresenham = bresenhamRadioButton.Checked;
-        }
         private void noneRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if(noneRadioButton.Checked)
+            if (noneRadioButton.Checked)
                 selectedEdge.SetConstraint(Constraint.None);
         }
         private void horizontalRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if(horizontalRadioButton.Checked)
+            if (horizontalRadioButton.Checked)
                 selectedEdge.SetConstraint(Constraint.Horizontal);
         }
         private void verticalRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if(verticalRadioButton.Checked)
+            if (verticalRadioButton.Checked)
                 selectedEdge.SetConstraint(Constraint.Vertical);
 
+        }
+        private void algorithmComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            useBresenham = this.algorithmComboBox.SelectedIndex == 1;
+            this.canvas.Invalidate();
         }
     }
 }
