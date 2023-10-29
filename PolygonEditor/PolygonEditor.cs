@@ -211,9 +211,11 @@ namespace PolygonEditor
                 ChangeHoveredVertex(null);
             }
             else if (e.KeyCode == Keys.H && selectedEdge != null)
-                selectedEdge.UpdateConstraints(Constraint.Horizontal);
-            else if (e.KeyCode == Keys.H && selectedEdge != null)
-                selectedEdge.UpdateConstraints(Constraint.Vertical);
+                selectedEdge.SetConstraint(Constraint.Horizontal);
+            else if (e.KeyCode == Keys.V && selectedEdge != null)
+                selectedEdge.SetConstraint(Constraint.Vertical);
+            else if (e.KeyCode == Keys.X && selectedEdge != null)
+                selectedEdge.SetConstraint(Constraint.None);
             this.canvas.Invalidate();
         }
         private void ChangeHoveredEdge(Edge? newHoveredEdge)

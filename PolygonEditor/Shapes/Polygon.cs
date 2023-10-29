@@ -28,6 +28,8 @@ namespace PolygonEditor.Shapes
         public int EdgeCount { get; private set; } = 0;
         public List<Edge> Edges { get; private set; }
         public List<Vertex> Vertices { get; private set; }
+        public List<Edge> InflatedEdges { get; private set; }
+        public List<Vertex> InflatedVerties { get; private set; }
         public bool Selected { get; set; } = false;
         public bool Hovered { get; set; } = false;
         public bool Finished { get; private set; } = false;
@@ -40,6 +42,8 @@ namespace PolygonEditor.Shapes
             };
             ++VertexCount;
             CenterOfMass = firstVertex.Point;
+            InflatedEdges = new List<Edge>();
+            InflatedVerties = new List<Vertex>();
         }
         public void AddVertex(int x, int y, bool connectToFirst = false)
         {
@@ -94,7 +98,10 @@ namespace PolygonEditor.Shapes
         public void Move(int dX, int dY)
         {
             foreach (Vertex vertex in this.Vertices)
-                vertex.Move(dX, dY);
+            {
+                vertex.X += dX;
+                vertex.Y += dY;
+            }
             CalculateCenterOfMass();
         }
         public void AddInBetween(Edge selectedEdge)
@@ -131,6 +138,7 @@ namespace PolygonEditor.Shapes
                     vertex.Draw(bitmap, e, brushes["black"]);
                 foreach (Edge edge in this.Edges)
                     edge.Draw(bitmap, e, pens["black"]);
+
             }
             e.Graphics.FillEllipse(brushes["red"], CenterOfMass.X - 5, CenterOfMass.Y - 5,
                 10, 10);

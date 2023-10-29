@@ -13,7 +13,7 @@ namespace PolygonEditor.Shapes
         Horizontal = 0,
         Vertical = 1,
     }
-    public class Edge : Shape
+    public class Edge
     {
         private static readonly double accuracy = 3.0;
         private static readonly Pen hoveredPen = new Pen(Color.Blue, 3);
@@ -34,14 +34,29 @@ namespace PolygonEditor.Shapes
         }
         public bool UpdateConstraints(Constraint constraint)
         {
-            bool canUpdate = Functions.UpdateConstraints(Vertex1, Vertex2, constraint);
-            if (canUpdate) this.Constraint = Constraint.None;
-            return canUpdate;
+            return Functions.UpdateConstraints(Vertex1, Vertex2, constraint);
         }
-        public override void Move(int dX, int dY)
+        public void SetConstraint(Constraint constraint)
         {
-            this.Vertex1!.Move(dX, dY);
-            this.Vertex2!.Move(dX, dY);
+            if(constraint == Constraint.None)
+            {
+                Constraint = constraint;
+                return;
+            }
+            if (constraint == Vertex1.Neighbors[1].constraint 
+                || constraint == Vertex2.Neighbors[0].constraint) return;
+
+            Constraint = constraint;
+            UpdateConstraints(constraint);
+            if(constraint == Constraint.Horizontal)
+                this.Vertex1.Y = this.Vertex2.Y;
+            else
+                this.Vertex1.X = this.Vertex2.X;
+        }
+        public void Move(int dX, int dY)
+        {
+            this.Vertex1!.MoveAtEdge(dX, dY, 0);
+            this.Vertex2!.MoveAtEdge(dX, dY, 1);
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, Pen pen)
         {
