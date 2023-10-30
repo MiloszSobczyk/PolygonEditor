@@ -1,0 +1,1 @@
+﻿Polygon editor to aplikacja pozwalająca na tworzenie i edycję wielokątów.
