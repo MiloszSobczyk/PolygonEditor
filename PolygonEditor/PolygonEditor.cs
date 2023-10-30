@@ -7,6 +7,7 @@ namespace PolygonEditor
     public partial class PolygonEditor : Form
     {
         private readonly List<Polygon> polygons;
+        private readonly List<Circle> circles;
         private bool useBresenham = false;
         private bool creatingPolygon = false;
         private bool editingPolygon = false;
@@ -26,36 +27,44 @@ namespace PolygonEditor
             InitializeComponent();
             bitmap = new Bitmap(this.canvas.Width, this.canvas.Height);
             polygons = new List<Polygon>();
+            circles = new List<Circle>();
             IntializePolygons();
+            InitializeCircles();
         }
         private void IntializePolygons()
         {
-            Polygon p1 = new Polygon(new Vertex(100, 100));
-            p1.AddVertex(300, 100);
-            p1.AddVertex(300, 300);
-            p1.AddVertex(100, 300);
-            p1.AddVertex(100, 100, true);
-            p1.Edges[0].SetConstraint(Constraint.Horizontal);
-            p1.Edges[1].SetConstraint(Constraint.Vertical);
-            polygons.Add(p1);
-            p1.CalculateOffset();
+            //Polygon p1 = new Polygon(new Vertex(100, 100));
+            //p1.AddVertex(300, 100);
+            //p1.AddVertex(300, 300);
+            //p1.AddVertex(100, 300);
+            //p1.AddVertex(100, 100, true);
+            //p1.Edges[0].SetConstraint(Constraint.Horizontal);
+            //p1.Edges[1].SetConstraint(Constraint.Vertical);
+            //polygons.Add(p1);
+            //p1.CalculateOffset();
 
-            Polygon p2 = new Polygon(new Vertex(650, 400));
-            p2.AddVertex(300, 400);
-            p2.AddVertex(400, 200);
-            p2.AddVertex(400, 100);
-            p2.AddVertex(550, 150);
-            p2.AddVertex(550, 200);
-            p2.AddVertex(650, 600, true);
-            p2.Edges[0].SetConstraint(Constraint.Horizontal);
-            p2.Edges[2].SetConstraint(Constraint.Vertical);
-            p2.Edges[4].SetConstraint(Constraint.Vertical);
-            polygons.Add(p2);
-            p2.CalculateOffset();
+            //Polygon p2 = new Polygon(new Vertex(650, 400));
+            //p2.AddVertex(300, 400);
+            //p2.AddVertex(400, 200);
+            //p2.AddVertex(400, 100);
+            //p2.AddVertex(550, 150);
+            //p2.AddVertex(550, 200);
+            //p2.AddVertex(650, 600, true);
+            //p2.Edges[0].SetConstraint(Constraint.Horizontal);
+            //p2.Edges[2].SetConstraint(Constraint.Vertical);
+            //p2.Edges[4].SetConstraint(Constraint.Vertical);
+            //polygons.Add(p2);
+            //p2.CalculateOffset();
+        }
+        private void InitializeCircles()
+        {
+            Circle c1 = new Circle(300, 300, 200);
+            circles.Add(c1);
         }
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
             this.polygons.ForEach(polygon => polygon.Draw(bitmap, e, useBresenham));
+            this.circles.ForEach(circle => circle.Draw(bitmap, e));
             if (creatingPolygon)
             {
                 Point lastPoint = selectedPolygon!.Vertices.Last().Point;
