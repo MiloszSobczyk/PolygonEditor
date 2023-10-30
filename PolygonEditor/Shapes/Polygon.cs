@@ -57,6 +57,7 @@ namespace PolygonEditor.Shapes
                 Edges.Add(new Edge(Vertices.Last(), Vertices[0]));
                 Finished = true;
                 RotateVertices();
+                CalculateOffset2();
             }
             else if(!Vertices.Any(v => v.X == x && v.Y == y))
             {
@@ -67,7 +68,6 @@ namespace PolygonEditor.Shapes
                 Edges.Add(new Edge(Vertices[Vertices.Count - 2], newVertex));
                 CalculateCenterOfMass();
             }
-            CalculateOffset2();
         }
         private void RotateVertices()
         {
@@ -93,9 +93,18 @@ namespace PolygonEditor.Shapes
         }
         public void RemoveVertex(Vertex vertex)
         {
+            int index = Vertices.IndexOf(vertex);
+            if (Vertices.Count == 3)
+            {
+                Vertices.RemoveAt(index);
+                Edges.RemoveAt(index);
+                Edges.RemoveAt(index == 0 ? Edges.Count - 1 : index - 1);
+                Finished = false;
+                return;
+            }
             if(Vertices.Count <= 2)
             {
-                Vertices.Remove(vertex);
+                Vertices.RemoveAt(index);
                 Edges.Clear();
                 if(Vertices.Count != 0) CalculateCenterOfMass();
                 Finished = false;
@@ -103,7 +112,6 @@ namespace PolygonEditor.Shapes
                 InflatedEdges.Clear();
                 return;
             }
-            int index = Vertices.IndexOf(vertex);
             if (index == -1) return;
             Vertex beforeVertex = index == 0 ? Vertices.Last() : Vertices[index - 1];
             Vertex afterVertex = index == Vertices.Count - 1 ? Vertices.First() : Vertices[index + 1];
@@ -378,8 +386,11 @@ namespace PolygonEditor.Shapes
             }
             foreach (Point vertex in temp)
                 InflatedVertices.Add(new Vertex(vertex.X, vertex.Y));
+            ResolveSelfIntersections(); // delete if it is bugged
             for(int i = 0; i < InflatedVertices.Count; ++i)
                 InflatedEdges.Add(new Edge(InflatedVertices[i], InflatedVertices[(i + 1) % InflatedVertices.Count]));
+
+            
 
             //if (offsetDistance > 3)
             //{

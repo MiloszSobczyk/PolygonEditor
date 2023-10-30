@@ -93,16 +93,16 @@ namespace PolygonEditor
             if (selectedVertex != null && mouseDown)
             {
                 selectedVertex.Move(mousePosition.X - selectedVertex.X, mousePosition.Y - selectedVertex.Y);
-                selectedPolygon!.CalculateOffset2();
+                if(drawOffsetCheckbox.Checked) selectedPolygon!.CalculateOffset2();
             }
             else if (selectedEdge != null && mouseDown)
             {
                 selectedEdge.Move(mousePosition.X - selectedEdge.ClickPoint.X,
                     mousePosition.Y - selectedEdge.ClickPoint.Y);
                 selectedEdge.ClickPoint = mousePosition;
-                selectedPolygon!.CalculateOffset2();
+                if(drawOffsetCheckbox.Checked) selectedPolygon!.CalculateOffset2();
             }
-            else if (selectedPolygon != null && mouseDown
+            else if (selectedPolygon != null && mouseDown && Functions.CalculateDistance(mousePosition, selectedPolygon.CenterOfMass) < 10.0f
                 && selectedEdge == null && selectedVertex == null)
             {
                 selectedPolygon.Move(mousePosition.X - selectedPolygon.CenterOfMass.X,
@@ -149,8 +149,13 @@ namespace PolygonEditor
                     ChangeSelectedVertex(hoveredVertex);
                     ChangeSelectedEdge(hoveredEdge);
                 }
-                if (e.Button == MouseButtons.Right && hoveredVertex != null)
+                if (e.Button == MouseButtons.Right)
                 {
+                    if(hoveredVertex == null)
+                    {
+                        ChangeSelectedPolygon(null);
+                        return;
+                    }
                     selectedPolygon!.RemoveVertex(hoveredVertex);
                     if (!selectedPolygon.Finished)
                     {
@@ -261,11 +266,14 @@ namespace PolygonEditor
                     this.horizontalRadioButton.Checked = true;
                 else if (selectedEdge.Constraint == Constraint.Vertical)
                     this.verticalRadioButton.Checked = true;
+
+                selectedPolygon!.CalculateOffset2();
             }
             this.canvas.Invalidate();
         }
         private void ChangeHoveredEdge(Edge? newHoveredEdge)
         {
+            if (creatingPolygon) return;
             if (hoveredEdge != null)
                 hoveredEdge.Hovered = false;
             hoveredEdge = newHoveredEdge;
@@ -379,14 +387,14 @@ namespace PolygonEditor
         }
         private void drawOffsetCheckbox_CheckedChanged(object sender, EventArgs e)
         {
+            foreach (Polygon polygon in polygons)
+                polygon.CalculateOffset2();
             this.canvas.Invalidate();
         }
-
         private void offsetTrackBar_Scroll(object sender, EventArgs e)
         {
 
         }
-
         private void offsetTrackBar_ValueChanged(object sender, EventArgs e)
         {
             Polygon.offsetDistance = offsetTrackBar.Value;
