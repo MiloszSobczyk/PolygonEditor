@@ -38,7 +38,7 @@ namespace PolygonEditor
             p1.Edges[0].SetConstraint(Constraint.Horizontal);
             p1.Edges[1].SetConstraint(Constraint.Vertical);
             polygons.Add(p1);
-            p1.DrawOffsetPolygon();
+            p1.CalculateOffset();
 
             Polygon p2 = new Polygon(new Vertex(650, 400));
             p2.AddVertex(300, 400);
@@ -51,7 +51,7 @@ namespace PolygonEditor
             p2.Edges[2].SetConstraint(Constraint.Vertical);
             p2.Edges[4].SetConstraint(Constraint.Vertical);
             polygons.Add(p2);
-            p2.DrawOffsetPolygon();
+            p2.CalculateOffset();
         }
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
@@ -62,7 +62,7 @@ namespace PolygonEditor
                 e.Graphics.DrawLine(Polygon.pens["blue"], lastPoint, mousePosition);
                 e.Graphics.FillEllipse(Polygon.brushes["blue"], lastPoint.X - 5, lastPoint.Y - 5, 10, 10);
             }
-            this.polygons.ForEach(polygon => polygon.DrawOffsetPolygon());
+            this.polygons.ForEach(polygon => polygon.CalculateOffset());
             if (drawOffsetCheckbox.Checked)
                 this.polygons.ForEach(polygon => polygon.DrawOffset(bitmap, e));
             e.Graphics.DrawImage(bitmap, 0, 0);
@@ -94,14 +94,14 @@ namespace PolygonEditor
             if (selectedVertex != null && mouseDown)
             {
                 selectedVertex.Move(mousePosition.X - selectedVertex.X, mousePosition.Y - selectedVertex.Y);
-                if(drawOffsetCheckbox.Checked) selectedPolygon!.DrawOffsetPolygon();
+                if(drawOffsetCheckbox.Checked) selectedPolygon!.CalculateOffset();
             }
             else if (selectedEdge != null && mouseDown)
             {
                 selectedEdge.Move(mousePosition.X - selectedEdge.ClickPoint.X,
                     mousePosition.Y - selectedEdge.ClickPoint.Y);
                 selectedEdge.ClickPoint = mousePosition;
-                if(drawOffsetCheckbox.Checked) selectedPolygon!.DrawOffsetPolygon();
+                if(drawOffsetCheckbox.Checked) selectedPolygon!.CalculateOffset();
             }
             else if (selectedPolygon != null && mouseDown && Functions.CalculateDistance(mousePosition, selectedPolygon.CenterOfMass) < 10.0f
                 && selectedEdge == null && selectedVertex == null)
@@ -270,7 +270,7 @@ namespace PolygonEditor
                 else if (selectedEdge.Constraint == Constraint.Vertical)
                     this.verticalRadioButton.Checked = true;
 
-                selectedPolygon!.DrawOffsetPolygon();
+                selectedPolygon!.CalculateOffset();
             }
             this.canvas.Invalidate();
         }
@@ -375,13 +375,13 @@ namespace PolygonEditor
         {
             if (horizontalRadioButton.Checked)
                 selectedEdge.SetConstraint(Constraint.Horizontal);
-            selectedPolygon.DrawOffsetPolygon();
+            selectedPolygon.CalculateOffset();
         }
         private void verticalRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             if (verticalRadioButton.Checked)
                 selectedEdge.SetConstraint(Constraint.Vertical);
-            selectedPolygon.DrawOffsetPolygon();
+            selectedPolygon.CalculateOffset();
         }
         private void bresenhamCheckbox_CheckedChanged(object sender, EventArgs e)
         {
@@ -391,7 +391,7 @@ namespace PolygonEditor
         private void drawOffsetCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             foreach (Polygon polygon in polygons)
-                polygon.DrawOffsetPolygon();
+                polygon.CalculateOffset();
             this.canvas.Invalidate();
         }
         private void offsetTrackBar_Scroll(object sender, EventArgs e)
@@ -402,7 +402,7 @@ namespace PolygonEditor
         {
             Polygon.offsetDistance = offsetTrackBar.Value;
             this.offsetLabel.Text = $"Current offset: {offsetTrackBar.Value}";
-            this.polygons.ForEach(polygon => polygon.DrawOffsetPolygon());
+            this.polygons.ForEach(polygon => polygon.CalculateOffset());
             this.canvas.Invalidate();
         }
     }

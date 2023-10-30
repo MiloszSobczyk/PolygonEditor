@@ -58,7 +58,7 @@ namespace PolygonEditor.Shapes
                 Edges.Add(new Edge(Vertices.Last(), Vertices[0]));
                 Finished = true;
                 RotateVertices();
-                DrawOffsetPolygon();
+                CalculateOffset();
             }
             else if (!Vertices.Any(v => v.X == x && v.Y == y))
             {
@@ -126,7 +126,7 @@ namespace PolygonEditor.Shapes
             Edges.Remove(beforeEdge);
             Vertices.RemoveAt(index);
             CalculateCenterOfMass();
-            DrawOffsetPolygon();
+            CalculateOffset();
         }
         public void Move(int dX, int dY)
         {
@@ -136,7 +136,7 @@ namespace PolygonEditor.Shapes
                 vertex.Y += dY;
             }
             CalculateCenterOfMass();
-            DrawOffsetPolygon();
+            CalculateOffset();
         }
         public void AddInBetween(Edge selectedEdge)
         {
@@ -156,7 +156,7 @@ namespace PolygonEditor.Shapes
             Edges.Remove(selectedEdge);
 
             CalculateCenterOfMass();
-            DrawOffsetPolygon();
+            CalculateOffset();
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, bool useBresenham = false)
         {
@@ -180,7 +180,7 @@ namespace PolygonEditor.Shapes
         }
         public void DrawOffset(Bitmap bitmap, PaintEventArgs e)
         {
-            if (Vertices.Count <= 2) return;
+            if (Vertices.Count <= 3 || !Finished) return;
             foreach (Vertex vertex in this.InflatedVertices)
                 vertex.Draw(bitmap, e, brushes["red"]);
             foreach (Edge edge in this.InflatedEdges)
@@ -198,22 +198,22 @@ namespace PolygonEditor.Shapes
             }
             return sum > 0;
         }
-        double length(Vertex p1, Vertex p2)
+        public double length(Vertex p1, Vertex p2)
         {
             Vertex vertex = new Vertex(p2.X - p1.X, p2.Y - p1.Y);
             return Math.Sqrt(vertex.X * vertex.X + vertex.Y * vertex.Y);
         }
-        double crossProduct(Vertex p1, Vertex p2, Vertex p3)
+        public double CrossProduct(Vertex p1, Vertex p2, Vertex p3)
         {
             return (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
         }
 
-        bool doLineSegmentsIntersect(Vertex p1, Vertex p2, Vertex p3, Vertex p4)
+        public bool CheckForIntersection(Vertex p1, Vertex p2, Vertex p3, Vertex p4)
         {
-            double cp1 = crossProduct(p1, p2, p3);
-            double cp2 = crossProduct(p1, p2, p4);
-            double cp3 = crossProduct(p3, p4, p1);
-            double cp4 = crossProduct(p3, p4, p2);
+            double cp1 = CrossProduct(p1, p2, p3);
+            double cp2 = CrossProduct(p1, p2, p4);
+            double cp3 = CrossProduct(p3, p4, p1);
+            double cp4 = CrossProduct(p3, p4, p2);
 
             if (((cp1 > 0 && cp2 < 0) || (cp1 < 0 && cp2 > 0)) &&
                 ((cp3 > 0 && cp4 < 0) || (cp3 < 0 && cp4 > 0)))
@@ -236,7 +236,7 @@ namespace PolygonEditor.Shapes
             return false;
         }
 
-        Vertex findIntersection(Vertex p1, Vertex p2, Vertex p3, Vertex p4)
+        public Vertex FindIntersection(Vertex p1, Vertex p2, Vertex p3, Vertex p4)
         {
             double A1 = p2.Y - p1.Y;
             double B1 = p1.X - p2.X;
@@ -254,7 +254,7 @@ namespace PolygonEditor.Shapes
             return new Vertex((int)X, (int)Y);
         }
 
-        public void DrawOffsetPolygon()
+        public void CalculateOffset()
         {
             List<Vertex> offsetPolygon = new List<Vertex>();
             for (int i = 0; i < Vertices.Count; i++)
@@ -273,10 +273,10 @@ namespace PolygonEditor.Shapes
                 if (offsetPolygon.Count > 1)
                     for (int j = 0; j < offsetPolygon.Count - 2; j++)
                     {
-                        if (doLineSegmentsIntersect(offsetPolygon[j], offsetPolygon[j + 1],
+                        if (CheckForIntersection(offsetPolygon[j], offsetPolygon[j + 1],
                             offsetPolygon[offsetPolygon.Count - 2], offsetPolygon[offsetPolygon.Count - 1]))
                         {
-                            Vertex intersectionPoint = findIntersection(offsetPolygon[j], offsetPolygon[j + 1],
+                            Vertex intersectionPoint = FindIntersection(offsetPolygon[j], offsetPolygon[j + 1],
                                 offsetPolygon[offsetPolygon.Count - 2], offsetPolygon[offsetPolygon.Count - 1]);
                             if (offsetPolygon.Count - j - 3 <= j + 2)
                             {
@@ -302,10 +302,10 @@ namespace PolygonEditor.Shapes
 
                 for (int j = 0; j < offsetPolygon.Count - 2; j++)
                 {
-                    if (doLineSegmentsIntersect(offsetPolygon[j], offsetPolygon[j + 1],
+                    if (CheckForIntersection(offsetPolygon[j], offsetPolygon[j + 1],
                         offsetPolygon[offsetPolygon.Count - 2], offsetPolygon[offsetPolygon.Count - 1]))
                     {
-                        Vertex intersectionPoint = findIntersection(offsetPolygon[j], offsetPolygon[j + 1],
+                        Vertex intersectionPoint = FindIntersection(offsetPolygon[j], offsetPolygon[j + 1],
                             offsetPolygon[offsetPolygon.Count - 2], offsetPolygon[offsetPolygon.Count - 1]);
 
                         if (offsetPolygon.Count - j - 3 <= j + 2)

@@ -1,1 +1,36 @@
 ﻿Polygon editor to aplikacja pozwalająca na tworzenie i edycję wielokątów.
+
+Obsługa:
+	LPM nad środkiem ciężkości wielokąta - wybór wielokąta/wejście w tryb edycji
+	LPM nad wierzchołkiem/krawędzią mając wybrany wielokąt - wybór wierzchołka/krawędzi
+	2xLPM nad krawędzią mając wybrany wielokąt - dodanie weirzchołka w środku krawędzi
+	PPM nad wierzchołkiem mając mając wybrany wielokąt - usunięcie wierzchołka
+	2xLPM - tryb tworzenia
+	LPM w trybie tworzenia - dodanie wierzchołka
+	PPM w trybie tworzenia - usunięcie wierzchołka
+	PPM poza wybranym wierzchołkiem - wyjście z trybu edycji
+
+Klawiszologia:
+	R - reset pola
+	Tab - następny wielokąt
+	H,V,N nad wybraną krawędzią - zmiana ograniczeń
+	Esc - wyjście z trybu edycji/tworzenia
+
+Algorytm ograniczeń krawędzi:
+	Założenia: 
+		Wierzchołki posiadają informacje o swoich sąsiadach i relacjach na tych krawędziach. 
+		Krawędzie wydłużają się lub skracają w zależności od potrzeb.
+	Działanie: 
+		W przypadku ruchu wierzchołka sprawdzamy informacje o jego sąsiadach i odpowiednio aktualizujemy ich współrzędne. 
+		W przypadku ruchu krawędzie sprawdzmy informacje o sąsiadach jego końców i odpowiednio aktualizaujemy współrzędne.
+		Musimy sprawdzać tylko to, ponieważ jedyne możliwe ograniczenia to poziome i pionowe oraz dwa takie same ograniczenia
+		nie mogą występować obok siebie.
+		Aktualizacja współrzędnych polega na zmianie tylko wspołrzędnej X lub Y
+
+Algorytm wyznaczania:
+	Założenia:
+		Wierzchołki w wielokącie uporządkowane są na liście zgodnie z ruchem wskazówek zegara.
+	Działanie:
+		Idziemy od pierwszego wierzchołka i kolejno sprawdzamy następne. Obliczamy możliwie występujące krawędzie i w przypadku
+		napotkania samoprzecięcia z poprzednią krawędzią usuwamy mniejszą część krawędzi i odpowednio aktualizujemy wierzchołki.
+		Po skończeniu działania tworzymy występujące krawędzie na podstawie uzyskanych wierzchołków.
