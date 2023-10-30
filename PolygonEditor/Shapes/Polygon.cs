@@ -56,6 +56,7 @@ namespace PolygonEditor.Shapes
                 ++EdgeCount;
                 Edges.Add(new Edge(Vertices.Last(), Vertices[0]));
                 Finished = true;
+                RotateVertices();
             }
             else if(!Vertices.Any(v => v.X == x && v.Y == y))
             {
@@ -66,7 +67,22 @@ namespace PolygonEditor.Shapes
                 Edges.Add(new Edge(Vertices[Vertices.Count - 2], newVertex));
                 CalculateCenterOfMass();
             }
-            CalculateOffset();
+            CalculateOffset2();
+        }
+        private void RotateVertices()
+        {
+            if (!IsClockwiseOffset()) return;
+            List<Vertex> copy = new List<Vertex>();
+            foreach(Vertex v in Vertices) copy.Add(v);
+            Vertices.Clear();
+            Edges.Clear();
+            Vertices.Add(copy.Last());
+            for(int i = copy.Count - 2; i >= 0; --i)
+            {
+                Vertex vertex = copy[i];
+                AddVertex(vertex.X, vertex.Y);
+            }
+            AddVertex(0, 0, true);
         }
         public void CalculateCenterOfMass()
         {
@@ -101,7 +117,7 @@ namespace PolygonEditor.Shapes
             Edges.Remove(beforeEdge);
             Vertices.RemoveAt(index);
             CalculateCenterOfMass();
-            CalculateOffset();
+            CalculateOffset2();
         }
         public void Move(int dX, int dY)
         {
@@ -111,6 +127,7 @@ namespace PolygonEditor.Shapes
                 vertex.Y += dY;
             }
             CalculateCenterOfMass();
+            CalculateOffset2();
         }
         public void AddInBetween(Edge selectedEdge)
         {
@@ -130,6 +147,7 @@ namespace PolygonEditor.Shapes
             Edges.Remove(selectedEdge);
 
             CalculateCenterOfMass();
+            CalculateOffset2();
         }
         public void Draw(Bitmap bitmap, PaintEventArgs e, bool useBresenham = false)
         {
@@ -301,6 +319,141 @@ namespace PolygonEditor.Shapes
             ResolveSelfIntersections();
             for(int i = 0; i < InflatedVertices.Count; ++i)
                 InflatedEdges.Add(new Edge(InflatedVertices[i], InflatedVertices[(i + 1) % InflatedVertices.Count]));
+        }
+        public void CalculateOffset2()
+        {
+            InflatedVertices.Clear();
+            InflatedEdges.Clear();
+
+            Vertex prev = Vertices.Last();
+            Point[] vectors = new Point[Vertices.Count];
+            (Point start, Point end)[] edges = new (Point start, Point end)[Vertices.Count];
+            List<Point> temp = new List<Point>();
+            double v1, v2, a, b, frac;
+            int counter = 0, square = offsetDistance * offsetDistance;
+            foreach (Vertex vertex in Vertices)
+            {
+                v1 = vertex.X - prev.X;
+                v2 = vertex.Y - prev.Y;
+                if (v1 == 0)
+                {
+                    a = offsetDistance;
+                    b = 0;
+                }
+                else if (v2 == 0)
+                {
+                    a = 0;
+                    b = offsetDistance;
+                }
+                else
+                {
+                    frac = v2 / v1;
+                    b = Math.Sqrt(square / (frac * frac + 1));
+                    a = Math.Abs(frac * b);
+                }
+                if (v1 > 0)
+                {
+                    if (v2 < 0) a *= -1;
+                    b *= -1;
+                }
+                else if (v2 < 0) a *= -1;
+                vectors[counter] = new Point((int)a, (int)b);
+                ++counter;
+                prev = vertex;
+            }
+            prev = Vertices.Last();
+            counter = 0;
+            foreach (Vertex vertex in Vertices)
+            {
+                edges[counter] = (new Point(prev.X + vectors[counter].X, prev.Y + vectors[counter].Y), new Point(vertex.X + vectors[counter].X, vertex.Y + vectors[counter].Y));
+                prev = vertex;
+                ++counter;
+            }
+            (Point start, Point end) prevEdge = edges[counter - 1];
+            foreach ((Point start, Point end) edge in edges)
+            {
+                if ((prevEdge.end.X != edge.start.X) || (prevEdge.end.Y != edge.start.Y)) 
+                    temp.Add(IntersectionPoint(prevEdge, edge));
+                prevEdge = edge;
+            }
+            foreach (Point vertex in temp)
+                InflatedVertices.Add(new Vertex(vertex.X, vertex.Y));
+            for(int i = 0; i < InflatedVertices.Count; ++i)
+                InflatedEdges.Add(new Edge(InflatedVertices[i], InflatedVertices[(i + 1) % InflatedVertices.Count]));
+
+            //if (offsetDistance > 3)
+            //{
+            //    Vertex prev = Vertices.Last();
+            //    Point[] vectors = new Point[Vertices.Count];
+            //    (Point start, Point end)[] edges = new (Point start, Point end)[Vertices.Count];
+            //    Point[] temp = new Point[Vertices.Count];
+            //    double v1, v2, a, b, frac;
+            //    int counter = 0, square = (int)((offsetDistance - 1.5) * (offsetDistance - 1.5));
+            //    foreach (Vertex vertex in Vertices)
+            //    {
+            //        v1 = vertex.X - prev.X;
+            //        v2 = vertex.Y - prev.Y;
+            //        if (v1 == 0)
+            //        {
+            //            a = (offsetDistance - 1.5);
+            //            b = 0;
+            //        }
+            //        else if (v2 == 0)
+            //        {
+            //            a = 0;
+            //            b = (offsetDistance - 1.5);
+            //        }
+            //        else
+            //        {
+            //            frac = v2 / v1;
+            //            b = Math.Sqrt(square / (frac * frac + 1));
+            //            a = Math.Abs(frac * b);
+            //        }
+            //        if (v1 > 0)
+            //        {
+            //            if (v2 < 0) a *= -1;
+            //            b *= -1;
+            //        }
+            //        else if (v2 < 0) a *= -1;
+            //        vectors[counter] = new Point((int)a, (int)b);
+            //        ++counter;
+            //        prev = vertex;
+            //    }
+            //    prev = Vertices.Last();
+            //    counter = 0;
+            //    foreach (Vertex vertex in Vertices)
+            //    {
+            //        edges[counter] = (new Point(prev.X + vectors[counter].X, prev.Y + vectors[counter].Y), new Point(vertex.X + vectors[counter].X, vertex.Y + vectors[counter].Y));
+            //        prev = vertex;
+            //        ++counter;
+            //    }
+            //    (Point start, Point end) prevEdge = edges[counter - 1];
+            //    counter = 0;
+            //    foreach ((Point start, Point end) line in edges)
+            //    {
+            //        if ((prevEdge.end.X != line.start.X) || (prevEdge.end.Y != line.start.Y)) temp[counter] = (IntersectionPoint(prevEdge, line));
+            //        else temp[counter] = new Point(0, 0);
+            //        prevEdge = line;
+            //        ++counter;
+            //    }
+            //    List<(Point, Point)> points = new List<(Point, Point)>();
+            //    for (int i = 0; i < temp.Length; ++i) 
+            //        if (temp[i].X != 0 || temp[i].Y != 0) 
+            //            points.Add((temp[i], Vertices.ElementAt(i).Point));
+            //    Console.WriteLine();
+            //}
+        }
+        private Point IntersectionPoint((Point, Point) prevLine, (Point, Point) line)
+        {
+            int x12 = prevLine.Item1.X - prevLine.Item2.X;
+            int x34 = line.Item1.X - line.Item2.X;
+            int y12 = prevLine.Item1.Y - prevLine.Item2.Y;
+            int y34 = line.Item1.Y - line.Item2.Y;
+            int xy12 = prevLine.Item1.X * prevLine.Item2.Y - prevLine.Item1.Y * prevLine.Item2.X;
+            int xy34 = line.Item1.X * line.Item2.Y - line.Item1.Y * line.Item2.X;
+            int frac = x12 * y34 - y12 * x34;
+            if (frac == 0) return new Point(0, 0);
+            return new Point((xy12 * x34 - x12 * xy34) / frac, (xy12 * y34 - xy34 * y12) / frac);
         }
     }
 }

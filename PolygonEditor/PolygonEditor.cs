@@ -38,6 +38,7 @@ namespace PolygonEditor
             p1.Edges[0].SetConstraint(Constraint.Horizontal);
             p1.Edges[1].SetConstraint(Constraint.Vertical);
             polygons.Add(p1);
+            p1.CalculateOffset2();
 
             Polygon p2 = new Polygon(new Vertex(650, 400));
             p2.AddVertex(300, 400);
@@ -50,6 +51,7 @@ namespace PolygonEditor
             p2.Edges[2].SetConstraint(Constraint.Vertical);
             p2.Edges[4].SetConstraint(Constraint.Vertical);
             polygons.Add(p2);
+            p2.CalculateOffset2();
         }
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
@@ -91,12 +93,14 @@ namespace PolygonEditor
             if (selectedVertex != null && mouseDown)
             {
                 selectedVertex.Move(mousePosition.X - selectedVertex.X, mousePosition.Y - selectedVertex.Y);
+                selectedPolygon!.CalculateOffset2();
             }
             else if (selectedEdge != null && mouseDown)
             {
                 selectedEdge.Move(mousePosition.X - selectedEdge.ClickPoint.X,
                     mousePosition.Y - selectedEdge.ClickPoint.Y);
                 selectedEdge.ClickPoint = mousePosition;
+                selectedPolygon!.CalculateOffset2();
             }
             else if (selectedPolygon != null && mouseDown
                 && selectedEdge == null && selectedVertex == null)
@@ -360,12 +364,13 @@ namespace PolygonEditor
         {
             if (horizontalRadioButton.Checked)
                 selectedEdge.SetConstraint(Constraint.Horizontal);
+            selectedPolygon.CalculateOffset2();
         }
         private void verticalRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             if (verticalRadioButton.Checked)
                 selectedEdge.SetConstraint(Constraint.Vertical);
-
+            selectedPolygon.CalculateOffset2();
         }
         private void bresenhamCheckbox_CheckedChanged(object sender, EventArgs e)
         {
@@ -386,7 +391,7 @@ namespace PolygonEditor
         {
             Polygon.offsetDistance = offsetTrackBar.Value;
             this.offsetLabel.Text = $"Current offset: {offsetTrackBar.Value}";
-            this.polygons.ForEach(polygon => polygon.CalculateOffset());
+            this.polygons.ForEach(polygon => polygon.CalculateOffset2());
             this.canvas.Invalidate();
         }
     }
